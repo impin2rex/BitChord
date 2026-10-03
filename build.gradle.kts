@@ -29,16 +29,14 @@ buildscript {
          * palette in place, which is why prod builds were fine and only dev
          * crashed. Removable once AGP itself bundles something past 8.11.32.
          */
-        classpath("com.android.tools:r8:8.13.23")
     }
 }
 plugins {
-    id("com.android.application") version "8.10.1" apply false
-    id("com.android.library") version "8.10.1" apply false
-    id("org.jetbrains.kotlin.android") version "2.3.20" apply false
-    id("org.jetbrains.kotlin.multiplatform") version "2.3.20" apply false
-    id("org.jetbrains.kotlin.jvm") version "2.3.20" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.3.20" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20" apply false
+    id("com.android.application") version "9.3.0" apply false
+    id("com.android.kotlin.multiplatform.library") version "9.3.0" apply false
+    id("org.jetbrains.kotlin.multiplatform") version "2.4.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.4.20" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.4.20" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.4.20" apply false
     id("org.jetbrains.compose") version "1.10.3" apply false
 }

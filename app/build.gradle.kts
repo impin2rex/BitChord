@@ -3,7 +3,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
@@ -73,7 +72,8 @@ android {
     namespace = "com.music.bitchord"
     // InnerTubeX's AAR requires compiling against 37; targetSdk (runtime behaviour) stays 36.
     compileSdk = 37
-
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "27.1.12297006"
     defaultConfig {
         applicationId = "com.music.bitchord"
         // 26 keeps reach wide; real-time blur (RenderEffect) kicks in on API 31+,
@@ -204,6 +204,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
     testOptions {
         unitTests {
