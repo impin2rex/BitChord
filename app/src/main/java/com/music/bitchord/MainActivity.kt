@@ -65,7 +65,7 @@ import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.rounded.Upgrade
 import com.music.bitchord.data.listentogether.ServerConnectionState
 import androidx.compose.material3.DropdownMenu
@@ -100,13 +100,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -444,7 +444,7 @@ private fun BitChordApp(
     viewModel: MainViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
     val hazeState = remember { HazeState() }
     // Recording the backdrop layer costs a draw pass, so it only runs when a
     // liquid-glass surface (the nav bar or artwork-page back button) can sample it.
@@ -1332,7 +1332,7 @@ private fun BitChordApp(
                 }.getOrDefault(false)
             }
         }
-        if (player.song?.videoId == song.videoId) {
+        if (player.song.videoId == song.videoId) {
             hasAlternateVersion = exists
         }
     }
@@ -3017,7 +3017,7 @@ private fun BitChordApp(
                             },
                             onBrowseClick = { item ->
                                 viewModel.recordEntity(SearchHistoryEntity(
-                                    id = item.browseId ?: "",
+                                    id = item.browseId,
                                     title = item.title,
                                     subtitle = item.subtitle.ifBlank { "" },
                                     artworkUrl = item.thumbnailUrl,
@@ -3254,8 +3254,8 @@ private fun BitChordApp(
                         showSettings -> ({ showSettings = false })
                         showReplay -> ({ showReplay = false })
                         detailActiveShelf != null -> ({ detailActiveShelf = null })
-                        detail != null -> ({ viewModel.closeDetail(); Unit })
-                        selectedMoodGenre != null -> ({ viewModel.closeMoodGenre(); Unit })
+                        detail != null -> ({ viewModel.closeDetail() })
+                        selectedMoodGenre != null -> ({ viewModel.closeMoodGenre() })
                         else -> null
                     },
                     modifier = Modifier.align(Alignment.TopCenter),
@@ -3402,7 +3402,7 @@ private fun BitChordApp(
                                 Box {
                                     IconButton(onClick = { librarySortMenuOpen = true }) {
                                         Icon(
-                                            Icons.Rounded.Sort,
+                                            Icons.AutoMirrored.Rounded.Sort,
                                             contentDescription = stringResource(R.string.sort_library),
                                             tint = MaterialTheme.colorScheme.onSurface,
                                         )
@@ -3438,7 +3438,7 @@ private fun BitChordApp(
                                 // can see the content it blurs.
                                 IconButton(onClick = { songSortMenuOpen = true }) {
                                     Icon(
-                                        Icons.Rounded.Sort,
+                                        Icons.AutoMirrored.Rounded.Sort,
                                         contentDescription = stringResource(R.string.sort_songs),
                                         tint = MaterialTheme.colorScheme.onSurface,
                                     )
@@ -3941,7 +3941,6 @@ private fun BitChordApp(
                     val original = convertedFromVideo
                     val originalAudio = convertedFromAudio
                     when {
-                        c == null -> Unit
                         original != null && (
                             convertedAudioId == song.videoId ||
                                 convertedAudioId == versionEffectiveSong.videoId ||
@@ -4104,7 +4103,7 @@ private fun BitChordApp(
                     controller?.currentMediaItem?.mediaId == song.videoId
                 ) {
                     {
-                        controller?.revertToOriginal()
+                        controller.revertToOriginal()
                         songActions = null
                     }
                 } else {
@@ -4149,7 +4148,7 @@ private fun BitChordApp(
                         songActions = null
                         scope.launch {
                             val text = TrackLog.forTrack(song, NerdStats.current.value)
-                            clipboard.setText(AnnotatedString(text))
+                            clipboard.setClipEntry(ClipEntry(android.content.ClipData.newPlainText(null, text)))
                             // The line count, not just "copied": it is the
                             // one thing the system's own paste confirmation
                             // doesn't say, and an empty log is a real

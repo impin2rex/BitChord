@@ -1968,7 +1968,7 @@ private fun List<Song>.playtimeSummary(): String {
         else -> {
             val hours = minutes / 60
             val rest = minutes % 60
-            val hourLabel = pluralStringResource(R.plurals.hour_count, hours.toInt(), hours)
+            val hourLabel = pluralStringResource(R.plurals.hour_count, hours, hours)
             if (rest == 0) {
                 stringResource(R.string.song_count_with_duration, count, hourLabel)
             } else {

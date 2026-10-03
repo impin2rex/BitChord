@@ -11,6 +11,8 @@ kotlin {
         namespace = "com.music.bitchord.shared"
         compileSdk = 37
 
+        withHostTest {}
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }

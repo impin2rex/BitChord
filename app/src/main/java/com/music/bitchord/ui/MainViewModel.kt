@@ -1299,6 +1299,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 reloadRemoteDetail(com.music.bitchord.data.webdav.WebDavConfig.BROWSE_ID)
             }
         }
+        @OptIn(FlowPreview::class)
         viewModelScope.launch {
             combine(
                 AppSettings.smbHost,

@@ -303,7 +303,7 @@ object SpotifyCanvas {
                 if (!response.isSuccessful) {
                     Log.w(TAG, "canvaz-cache http ${response.code} for $trackUri")
                 }
-                if (response.isSuccessful) response.body?.bytes() else null
+                if (response.isSuccessful) response.body.bytes() else null
             }
         }.onFailure { Log.w(TAG, "canvaz-cache request threw: ${it.message}") }.getOrNull() ?: return null
 

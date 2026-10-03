@@ -69,7 +69,7 @@ object AppUpdateChecker {
         runCatching {
             val request = Request.Builder().url(LATEST_RELEASE_URL).build()
             val body = Http.client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) null else response.body?.string()
+                if (!response.isSuccessful) null else response.body.string()
             } ?: return@runCatching
             val release = json.parseToJsonElement(body) as? JsonObject ?: return@runCatching
             val tag = release["tag_name"]?.jsonPrimitive?.contentOrNull ?: return@runCatching
@@ -132,7 +132,7 @@ object AppUpdateChecker {
             val request = Request.Builder().url(url).build()
             Http.client.newCall(request).execute().use { response ->
                 check(response.isSuccessful) { "Download failed: HTTP ${response.code}" }
-                val body = response.body ?: error("Empty download body")
+                val body = response.body
                 val total = body.contentLength().takeIf { it > 0 }
 
                 body.byteStream().use { input ->
@@ -195,8 +195,12 @@ object AppUpdateChecker {
             return
         }
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        // ACTION_INSTALL_PACKAGE is deprecated in favour of PackageInstaller
+        // sessions, but still works and keeps the system installer UI.
+        @Suppress("DEPRECATION")
+        val install = Intent.ACTION_INSTALL_PACKAGE
         context.startActivity(
-            Intent(Intent.ACTION_INSTALL_PACKAGE)
+            Intent(install)
                 .setDataAndType(uri, "application/vnd.android.package-archive")
                 .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
                 .putExtra(Intent.EXTRA_RETURN_RESULT, true)

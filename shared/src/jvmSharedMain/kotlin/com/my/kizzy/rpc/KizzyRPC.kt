@@ -175,7 +175,7 @@ open class KizzyRPC(
             }.bodyAsText()
             // kotlinx rather than org.json: this module is shared with the
             // desktop, which has no Android JSON on its classpath.
-            val json = Json { ignoreUnknownKeys = true }
+            val json = Json
                 .parseToJsonElement(response).jsonObject
             fun field(name: String): String? =
                 json[name]?.jsonPrimitive?.contentOrNull?.takeIf { it != "null" }
