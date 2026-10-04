@@ -2,17 +2,12 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.kotlin.multiplatform.library")
+    id("com.android.library")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 kotlin {
-    android {
-        namespace = "com.music.bitchord.shared"
-        compileSdk = 37
-
-        withHostTest {}
-
+    androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -65,3 +60,7 @@ kotlin {
     }
 }
 
+android {
+    namespace = "com.music.bitchord.shared"
+    compileSdk = 36
+}
