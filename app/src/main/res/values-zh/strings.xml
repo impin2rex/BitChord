@@ -1247,4 +1247,12 @@
     <string name="spotify_import_unmatched">有 %1$d 首歌曲在 YouTube Music 上未找到</string>
     <string name="local_playlist_subtitle">%1$d 首歌曲 · 在此设备上</string>
     <string name="spotify_import_empty_playlist">此歌单中没有歌曲</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">登录以加载你的歌单。播放使用 YouTube Music。</string>
+    <string name="spotify_sign_in">使用 Spotify 登录</string>
+    <string name="spotify_disconnect">断开连接</string>
+    <string name="spotify_empty_playlists">此账号下没有歌单</string>
+    <string name="spotify_empty_tracks">此歌单中没有歌曲</string>
+    <string name="spotify_track_unavailable">在 YouTube Music 上找不到这首歌</string>
+    <string name="spotify_library_subtitle">你的 Spotify 歌单</string>
 </resources>

@@ -1225,4 +1225,12 @@
     <string name="spotify_import_unmatched">%1$d şarkı YouTube Music’te bulunamadı</string>
     <string name="local_playlist_subtitle">%1$d şarkı · Bu cihazda</string>
     <string name="spotify_import_empty_playlist">Bu çalma listesinde şarkı yok</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Çalma listelerini yüklemek için giriş yap. Oynatma YouTube Music ile yapılır.</string>
+    <string name="spotify_sign_in">Spotify ile giriş yap</string>
+    <string name="spotify_disconnect">Bağlantıyı kes</string>
+    <string name="spotify_empty_playlists">Bu hesapta çalma listesi yok</string>
+    <string name="spotify_empty_tracks">Bu çalma listesinde şarkı yok</string>
+    <string name="spotify_track_unavailable">Bu şarkı YouTube Music’te bulunamadı</string>
+    <string name="spotify_library_subtitle">Spotify çalma listelerin</string>
 </resources>

@@ -1269,4 +1269,12 @@
     <string name="spotify_import_unmatched">%1$d titres introuvables sur YouTube Music</string>
     <string name="local_playlist_subtitle">%1$d titres · Sur cet appareil</string>
     <string name="spotify_import_empty_playlist">Aucun titre dans cette playlist</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Connectez-vous pour charger vos playlists. La lecture utilise YouTube Music.</string>
+    <string name="spotify_sign_in">Se connecter avec Spotify</string>
+    <string name="spotify_disconnect">Se déconnecter</string>
+    <string name="spotify_empty_playlists">Aucune playlist sur ce compte</string>
+    <string name="spotify_empty_tracks">Cette playlist ne contient aucun titre</string>
+    <string name="spotify_track_unavailable">Impossible de trouver ce titre sur YouTube Music</string>
+    <string name="spotify_library_subtitle">Vos playlists Spotify</string>
 </resources>

@@ -1187,4 +1187,12 @@
     <string name="spotify_import_unmatched">Không tìm thấy %1$d bài hát trên YouTube Music</string>
     <string name="local_playlist_subtitle">%1$d bài hát · Trên thiết bị này</string>
     <string name="spotify_import_empty_playlist">Không có bài hát nào trong danh sách phát này</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Đăng nhập để tải danh sách phát của bạn. Việc phát nhạc dùng YouTube Music.</string>
+    <string name="spotify_sign_in">Đăng nhập bằng Spotify</string>
+    <string name="spotify_disconnect">Ngắt kết nối</string>
+    <string name="spotify_empty_playlists">Không có danh sách phát nào trong tài khoản này</string>
+    <string name="spotify_empty_tracks">Danh sách phát này không có bài hát</string>
+    <string name="spotify_track_unavailable">Không tìm thấy bài hát đó trên YouTube Music</string>
+    <string name="spotify_library_subtitle">Danh sách phát Spotify của bạn</string>
 </resources>

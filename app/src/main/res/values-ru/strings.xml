@@ -1296,4 +1296,12 @@
     <string name="spotify_import_unmatched">Не найдено в YouTube Music: %1$d треков</string>
     <string name="local_playlist_subtitle">%1$d треков · На этом устройстве</string>
     <string name="spotify_import_empty_playlist">В этом плейлисте нет треков</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Войдите, чтобы загрузить свои плейлисты. Воспроизведение идёт через YouTube Music.</string>
+    <string name="spotify_sign_in">Войти через Spotify</string>
+    <string name="spotify_disconnect">Отключить</string>
+    <string name="spotify_empty_playlists">В этом аккаунте нет плейлистов</string>
+    <string name="spotify_empty_tracks">В этом плейлисте нет треков</string>
+    <string name="spotify_track_unavailable">Не удалось найти этот трек в YouTube Music</string>
+    <string name="spotify_library_subtitle">Ваши плейлисты Spotify</string>
 </resources>

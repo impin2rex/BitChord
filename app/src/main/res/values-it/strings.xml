@@ -1207,4 +1207,12 @@
     <string name="spotify_import_unmatched">%1$d brani non trovati su YouTube Music</string>
     <string name="local_playlist_subtitle">%1$d brani · Su questo dispositivo</string>
     <string name="spotify_import_empty_playlist">Nessun brano in questa playlist</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Accedi per caricare le tue playlist. La riproduzione usa YouTube Music.</string>
+    <string name="spotify_sign_in">Accedi con Spotify</string>
+    <string name="spotify_disconnect">Disconnetti</string>
+    <string name="spotify_empty_playlists">Nessuna playlist in questo account</string>
+    <string name="spotify_empty_tracks">Questa playlist non ha brani</string>
+    <string name="spotify_track_unavailable">Impossibile trovare quel brano su YouTube Music</string>
+    <string name="spotify_library_subtitle">Le tue playlist Spotify</string>
 </resources>

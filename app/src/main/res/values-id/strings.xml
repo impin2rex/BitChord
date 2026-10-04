@@ -1247,4 +1247,12 @@
     <string name="spotify_import_unmatched">%1$d lagu tidak ditemukan di YouTube Music</string>
     <string name="local_playlist_subtitle">%1$d lagu · Di perangkat ini</string>
     <string name="spotify_import_empty_playlist">Tidak ada lagu di playlist ini</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Masuk untuk memuat playlist Anda. Pemutaran menggunakan YouTube Music.</string>
+    <string name="spotify_sign_in">Masuk dengan Spotify</string>
+    <string name="spotify_disconnect">Putuskan</string>
+    <string name="spotify_empty_playlists">Tidak ada playlist di akun ini</string>
+    <string name="spotify_empty_tracks">Playlist ini tidak memiliki lagu</string>
+    <string name="spotify_track_unavailable">Lagu itu tidak ditemukan di YouTube Music</string>
+    <string name="spotify_library_subtitle">Playlist Spotify Anda</string>
 </resources>

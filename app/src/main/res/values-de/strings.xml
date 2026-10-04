@@ -1268,4 +1268,12 @@
     <string name="spotify_import_unmatched">%1$d Songs wurden auf YouTube Music nicht gefunden</string>
     <string name="local_playlist_subtitle">%1$d Songs · Auf diesem Gerät</string>
     <string name="spotify_import_empty_playlist">Keine Songs in dieser Playlist</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Melde dich an, um deine Playlists zu laden. Die Wiedergabe erfolgt über YouTube Music.</string>
+    <string name="spotify_sign_in">Mit Spotify anmelden</string>
+    <string name="spotify_disconnect">Trennen</string>
+    <string name="spotify_empty_playlists">Keine Playlists in diesem Konto</string>
+    <string name="spotify_empty_tracks">Diese Playlist enthält keine Titel</string>
+    <string name="spotify_track_unavailable">Dieser Song wurde auf YouTube Music nicht gefunden</string>
+    <string name="spotify_library_subtitle">Deine Spotify-Playlists</string>
 </resources>

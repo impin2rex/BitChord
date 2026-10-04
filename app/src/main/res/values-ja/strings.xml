@@ -1248,4 +1248,12 @@
     <string name="spotify_import_unmatched">%1$d曲がYouTube Musicで見つかりませんでした</string>
     <string name="local_playlist_subtitle">%1$d曲 · このデバイス内</string>
     <string name="spotify_import_empty_playlist">このプレイリストに曲はありません</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">サインインしてプレイリストを読み込みます。再生にはYouTube Musicを使用します。</string>
+    <string name="spotify_sign_in">Spotifyでサインイン</string>
+    <string name="spotify_disconnect">連携を解除</string>
+    <string name="spotify_empty_playlists">このアカウントにプレイリストはありません</string>
+    <string name="spotify_empty_tracks">このプレイリストに曲はありません</string>
+    <string name="spotify_track_unavailable">その曲はYouTube Musicで見つかりませんでした</string>
+    <string name="spotify_library_subtitle">あなたのSpotifyプレイリスト</string>
 </resources>

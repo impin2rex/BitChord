@@ -1308,4 +1308,12 @@
     <string name="spotify_import_unmatched">Nie znaleziono %1$d utworów w YouTube Music</string>
     <string name="local_playlist_subtitle">%1$d utworów · Na tym urządzeniu</string>
     <string name="spotify_import_empty_playlist">Brak utworów w tej playliście</string>
+    <string name="spotify">Spotify</string>
+    <string name="spotify_connect_subtitle">Zaloguj się, aby wczytać swoje playlisty. Odtwarzanie korzysta z YouTube Music.</string>
+    <string name="spotify_sign_in">Zaloguj się przez Spotify</string>
+    <string name="spotify_disconnect">Rozłącz</string>
+    <string name="spotify_empty_playlists">Brak playlist na tym koncie</string>
+    <string name="spotify_empty_tracks">Ta playlista nie ma utworów</string>
+    <string name="spotify_track_unavailable">Nie znaleziono tego utworu w YouTube Music</string>
+    <string name="spotify_library_subtitle">Twoje playlisty Spotify</string>
 </resources>
