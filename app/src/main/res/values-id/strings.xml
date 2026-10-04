@@ -1225,4 +1225,26 @@
     <string name="song_cache_unlimited_subtitle">Tanpa batas. Audio dalam cache bisa terus bertambah hingga penyimpanan penuh.</string>
     <string name="clear_song_cache_title">Hapus cache lagu?</string>
     <string name="clear_song_cache_warning">Semua lagu dalam cache akan dihapus dan folder lagu dalam cache akan dikosongkan. Lagu akan di-streaming lagi saat diputar berikutnya.</string>
+    <string name="recent_album">Album Terbaru</string>
+    <string name="recent_single">Single Terbaru</string>
+    <string name="recent_ep">EP Terbaru</string>
+    <string name="lossless_output_permission_denied">Izin perangkat di sekitar nonaktif</string>
+    <string name="lossless_output_permission_denied_detail">Ketuk untuk membuka Setelan dan izinkan Perangkat di sekitar — tanpanya kami tidak dapat membaca codec Bluetooth Anda</string>
+    <string name="import_spotify">Impor Spotify</string>
+    <string name="import_spotify_subtitle">Dari tautan playlist</string>
+    <string name="spotify_import_title">Impor playlist Spotify</string>
+    <string name="spotify_import_description">Tempel tautan playlist publik. Lagu dicocokkan di YouTube Music.</string>
+    <string name="spotify_import_description_local">Tempel tautan playlist publik. Lagu dicocokkan di YouTube Music dan disimpan di perangkat ini.</string>
+    <string name="spotify_import_invalid">Itu bukan tautan playlist Spotify.</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Membaca playlist Spotify…</string>
+    <string name="spotify_import_matching">Mencocokkan lagu %1$d dari %2$d</string>
+    <string name="spotify_import_none">Tidak ada lagu tersebut yang ditemukan di YouTube Music.</string>
+    <string name="spotify_import_failed">Tidak dapat mengimpor playlist: %1$s</string>
+    <string name="spotify_import_button">Impor</string>
+    <string name="spotify_import_local_fallback">Tidak dapat membuatnya di YouTube Music, jadi “%1$s” disimpan di perangkat ini.</string>
+    <string name="spotify_import_done">“%1$s” diimpor</string>
+    <string name="spotify_import_unmatched">%1$d lagu tidak ditemukan di YouTube Music</string>
+    <string name="local_playlist_subtitle">%1$d lagu · Di perangkat ini</string>
+    <string name="spotify_import_empty_playlist">Tidak ada lagu di playlist ini</string>
 </resources>

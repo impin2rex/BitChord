@@ -1226,4 +1226,26 @@
     <string name="song_cache_unlimited_subtitle">上限なし。キャッシュされた音声はストレージがいっぱいになるまで増え続けます。</string>
     <string name="clear_song_cache_title">曲キャッシュを消去しますか？</string>
     <string name="clear_song_cache_warning">キャッシュ済みの曲はすべて削除され、キャッシュ済みの曲フォルダは空になります。次回再生時に再びストリーミングされます。</string>
+    <string name="recent_album">最近のアルバム</string>
+    <string name="recent_single">最近のシングル</string>
+    <string name="recent_ep">最近のEP</string>
+    <string name="lossless_output_permission_denied">付近のデバイスの権限がオフです</string>
+    <string name="lossless_output_permission_denied_detail">タップして設定を開き、付近のデバイスを許可してください。許可がないとBluetoothコーデックを読み取れません</string>
+    <string name="import_spotify">Spotifyからインポート</string>
+    <string name="import_spotify_subtitle">プレイリストのリンクから</string>
+    <string name="spotify_import_title">Spotifyプレイリストをインポート</string>
+    <string name="spotify_import_description">公開プレイリストのリンクを貼り付けてください。曲はYouTube Musicで照合されます。</string>
+    <string name="spotify_import_description_local">公開プレイリストのリンクを貼り付けてください。曲はYouTube Musicで照合され、このデバイスに保存されます。</string>
+    <string name="spotify_import_invalid">Spotifyプレイリストのリンクではありません。</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Spotifyプレイリストを読み込み中…</string>
+    <string name="spotify_import_matching">曲を照合中 %1$d / %2$d</string>
+    <string name="spotify_import_none">これらの曲はYouTube Musicで見つかりませんでした。</string>
+    <string name="spotify_import_failed">プレイリストをインポートできませんでした: %1$s</string>
+    <string name="spotify_import_button">インポート</string>
+    <string name="spotify_import_local_fallback">YouTube Musicに作成できなかったため、「%1$s」をこのデバイスに保存しました。</string>
+    <string name="spotify_import_done">「%1$s」をインポートしました</string>
+    <string name="spotify_import_unmatched">%1$d曲がYouTube Musicで見つかりませんでした</string>
+    <string name="local_playlist_subtitle">%1$d曲 · このデバイス内</string>
+    <string name="spotify_import_empty_playlist">このプレイリストに曲はありません</string>
 </resources>

@@ -1185,4 +1185,26 @@
     <string name="song_cache_unlimited_subtitle">Nessun limite. L’audio in cache può crescere fino a riempire la memoria.</string>
     <string name="clear_song_cache_title">Svuotare la cache dei brani?</string>
     <string name="clear_song_cache_warning">Tutti i brani in cache verranno eliminati e la cartella dei brani in cache verrà svuotata. Verranno riprodotti di nuovo in streaming la prossima volta.</string>
+    <string name="recent_album">Album recente</string>
+    <string name="recent_single">Singolo recente</string>
+    <string name="recent_ep">EP recente</string>
+    <string name="lossless_output_permission_denied">L’autorizzazione Dispositivi nelle vicinanze è disattivata</string>
+    <string name="lossless_output_permission_denied_detail">Tocca per aprire le Impostazioni e consentire Dispositivi nelle vicinanze: senza di essa non possiamo leggere il codec Bluetooth</string>
+    <string name="import_spotify">Importa da Spotify</string>
+    <string name="import_spotify_subtitle">Da un link a una playlist</string>
+    <string name="spotify_import_title">Importa playlist Spotify</string>
+    <string name="spotify_import_description">Incolla il link di una playlist pubblica. I brani vengono abbinati su YouTube Music.</string>
+    <string name="spotify_import_description_local">Incolla il link di una playlist pubblica. I brani vengono abbinati su YouTube Music e salvati su questo dispositivo.</string>
+    <string name="spotify_import_invalid">Questo non è un link a una playlist Spotify.</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Lettura della playlist Spotify…</string>
+    <string name="spotify_import_matching">Abbinamento brani %1$d di %2$d</string>
+    <string name="spotify_import_none">Nessuno di questi brani è stato trovato su YouTube Music.</string>
+    <string name="spotify_import_failed">Impossibile importare la playlist: %1$s</string>
+    <string name="spotify_import_button">Importa</string>
+    <string name="spotify_import_local_fallback">Impossibile crearla su YouTube Music, quindi «%1$s» è stata salvata su questo dispositivo.</string>
+    <string name="spotify_import_done">«%1$s» importata</string>
+    <string name="spotify_import_unmatched">%1$d brani non trovati su YouTube Music</string>
+    <string name="local_playlist_subtitle">%1$d brani · Su questo dispositivo</string>
+    <string name="spotify_import_empty_playlist">Nessun brano in questa playlist</string>
 </resources>

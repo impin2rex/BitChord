@@ -1251,4 +1251,26 @@
     <string name="song_cache_unlimited_subtitle">אין מגבלה. האודיו במטמון יכול לגדול עד שהאחסון יתמלא.</string>
     <string name="clear_song_cache_title">לנקות את מטמון השירים?</string>
     <string name="clear_song_cache_warning">כל השירים במטמון יימחקו ותיקיית השירים במטמון תתרוקן. הם יוזרמו שוב בפעם הבאה שתנגן אותם.</string>
+    <string name="recent_album">אלבום אחרון</string>
+    <string name="recent_single">סינגל אחרון</string>
+    <string name="recent_ep">EP אחרון</string>
+    <string name="lossless_output_permission_denied">ההרשאה “מכשירים בקרבת מקום” כבויה</string>
+    <string name="lossless_output_permission_denied_detail">הקש כדי לפתוח את ההגדרות ולאפשר “מכשירים בקרבת מקום” — בלעדיה לא נוכל לקרוא את קודק ה-Bluetooth שלך</string>
+    <string name="import_spotify">ייבוא מ-Spotify</string>
+    <string name="import_spotify_subtitle">מקישור לפלייליסט</string>
+    <string name="spotify_import_title">ייבוא פלייליסט מ-Spotify</string>
+    <string name="spotify_import_description">הדבק קישור לפלייליסט ציבורי. השירים מותאמים ב-YouTube Music.</string>
+    <string name="spotify_import_description_local">הדבק קישור לפלייליסט ציבורי. השירים מותאמים ב-YouTube Music ונשמרים במכשיר זה.</string>
+    <string name="spotify_import_invalid">זה לא קישור לפלייליסט של Spotify.</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">קורא את הפלייליסט של Spotify…</string>
+    <string name="spotify_import_matching">מתאים שירים %1$d מתוך %2$d</string>
+    <string name="spotify_import_none">אף אחד מהשירים האלה לא נמצא ב-YouTube Music.</string>
+    <string name="spotify_import_failed">לא ניתן היה לייבא את הפלייליסט: %1$s</string>
+    <string name="spotify_import_button">ייבוא</string>
+    <string name="spotify_import_local_fallback">לא ניתן היה ליצור אותו ב-YouTube Music, ולכן “%1$s” נשמר במכשיר זה.</string>
+    <string name="spotify_import_done">“%1$s” יובא</string>
+    <string name="spotify_import_unmatched">%1$d שירים לא נמצאו ב-YouTube Music</string>
+    <string name="local_playlist_subtitle">%1$d שירים · במכשיר זה</string>
+    <string name="spotify_import_empty_playlist">אין שירים בפלייליסט הזה</string>
 </resources>

@@ -1225,4 +1225,26 @@
     <string name="song_cache_unlimited_subtitle">无上限。缓存的音频会一直增长，直到存储空间用完。</string>
     <string name="clear_song_cache_title">清除歌曲缓存？</string>
     <string name="clear_song_cache_warning">所有已缓存的歌曲都将被删除，已缓存歌曲文件夹也会被清空。下次播放时会重新在线播放。</string>
+    <string name="recent_album">最新专辑</string>
+    <string name="recent_single">最新单曲</string>
+    <string name="recent_ep">最新 EP</string>
+    <string name="lossless_output_permission_denied">附近设备权限已关闭</string>
+    <string name="lossless_output_permission_denied_detail">点按以打开设置并允许“附近设备”权限，否则我们无法读取你的蓝牙编解码器</string>
+    <string name="import_spotify">导入 Spotify</string>
+    <string name="import_spotify_subtitle">通过歌单链接</string>
+    <string name="spotify_import_title">导入 Spotify 歌单</string>
+    <string name="spotify_import_description">粘贴公开歌单的链接。歌曲将在 YouTube Music 上匹配。</string>
+    <string name="spotify_import_description_local">粘贴公开歌单的链接。歌曲将在 YouTube Music 上匹配，并保存在此设备上。</string>
+    <string name="spotify_import_invalid">这不是 Spotify 歌单链接。</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">正在读取 Spotify 歌单…</string>
+    <string name="spotify_import_matching">正在匹配歌曲 %1$d/%2$d</string>
+    <string name="spotify_import_none">这些歌曲在 YouTube Music 上都没有找到。</string>
+    <string name="spotify_import_failed">无法导入歌单：%1$s</string>
+    <string name="spotify_import_button">导入</string>
+    <string name="spotify_import_local_fallback">无法在 YouTube Music 上创建，因此已将“%1$s”保存在此设备上。</string>
+    <string name="spotify_import_done">已导入“%1$s”</string>
+    <string name="spotify_import_unmatched">有 %1$d 首歌曲在 YouTube Music 上未找到</string>
+    <string name="local_playlist_subtitle">%1$d 首歌曲 · 在此设备上</string>
+    <string name="spotify_import_empty_playlist">此歌单中没有歌曲</string>
 </resources>

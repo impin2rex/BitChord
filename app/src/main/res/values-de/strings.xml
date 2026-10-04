@@ -1246,4 +1246,26 @@
     <string name="song_cache_unlimited_subtitle">Kein Limit. Zwischengespeicherte Audiodaten können wachsen, bis dein Speicher voll ist.</string>
     <string name="clear_song_cache_title">Song-Cache leeren?</string>
     <string name="clear_song_cache_warning">Alle zwischengespeicherten Songs werden gelöscht und der Ordner für zwischengespeicherte Songs wird geleert. Beim nächsten Abspielen werden sie erneut gestreamt.</string>
+    <string name="recent_album">Neues Album</string>
+    <string name="recent_single">Neue Single</string>
+    <string name="recent_ep">Neue EP</string>
+    <string name="lossless_output_permission_denied">Berechtigung „Geräte in der Nähe“ ist deaktiviert</string>
+    <string name="lossless_output_permission_denied_detail">Tippen, um die Einstellungen zu öffnen und „Geräte in der Nähe“ zu erlauben – ohne sie können wir deinen Bluetooth-Codec nicht auslesen</string>
+    <string name="import_spotify">Spotify importieren</string>
+    <string name="import_spotify_subtitle">Über einen Playlist-Link</string>
+    <string name="spotify_import_title">Spotify-Playlist importieren</string>
+    <string name="spotify_import_description">Füge den Link einer öffentlichen Playlist ein. Die Songs werden auf YouTube Music zugeordnet.</string>
+    <string name="spotify_import_description_local">Füge den Link einer öffentlichen Playlist ein. Die Songs werden auf YouTube Music zugeordnet und auf diesem Gerät gespeichert.</string>
+    <string name="spotify_import_invalid">Das ist kein Spotify-Playlist-Link.</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Spotify-Playlist wird gelesen…</string>
+    <string name="spotify_import_matching">Songs werden zugeordnet: %1$d von %2$d</string>
+    <string name="spotify_import_none">Keiner dieser Songs wurde auf YouTube Music gefunden.</string>
+    <string name="spotify_import_failed">Playlist konnte nicht importiert werden: %1$s</string>
+    <string name="spotify_import_button">Importieren</string>
+    <string name="spotify_import_local_fallback">Auf YouTube Music konnte sie nicht erstellt werden, daher wurde „%1$s“ auf diesem Gerät gespeichert.</string>
+    <string name="spotify_import_done">„%1$s“ importiert</string>
+    <string name="spotify_import_unmatched">%1$d Songs wurden auf YouTube Music nicht gefunden</string>
+    <string name="local_playlist_subtitle">%1$d Songs · Auf diesem Gerät</string>
+    <string name="spotify_import_empty_playlist">Keine Songs in dieser Playlist</string>
 </resources>

@@ -1246,4 +1246,26 @@
     <string name="song_cache_unlimited_subtitle">कोई सीमा नहीं। कैश ऑडियो स्टोरेज भरने तक बढ़ सकता है।</string>
     <string name="clear_song_cache_title">सॉन्ग कैश साफ़ करें?</string>
     <string name="clear_song_cache_warning">सभी कैश किए गए गाने हटा दिए जाएँगे और कैश किए गए गानों का फ़ोल्डर खाली हो जाएगा। अगली बार चलाने पर वे फिर से स्ट्रीम होंगे।</string>
+    <string name="recent_album">हाल का एल्बम</string>
+    <string name="recent_single">हाल का सिंगल</string>
+    <string name="recent_ep">हाल का EP</string>
+    <string name="lossless_output_permission_denied">आस-पास के डिवाइस की अनुमति बंद है</string>
+    <string name="lossless_output_permission_denied_detail">सेटिंग खोलने और आस-पास के डिवाइस को अनुमति देने के लिए टैप करें — इसके बिना हम आपका ब्लूटूथ कोडेक नहीं पढ़ सकते</string>
+    <string name="import_spotify">Spotify इम्पोर्ट करें</string>
+    <string name="import_spotify_subtitle">प्लेलिस्ट लिंक से</string>
+    <string name="spotify_import_title">Spotify प्लेलिस्ट इम्पोर्ट करें</string>
+    <string name="spotify_import_description">किसी सार्वजनिक प्लेलिस्ट का लिंक पेस्ट करें। गाने YouTube Music पर मिलाए जाते हैं।</string>
+    <string name="spotify_import_description_local">किसी सार्वजनिक प्लेलिस्ट का लिंक पेस्ट करें। गाने YouTube Music पर मिलाए जाते हैं और इस डिवाइस पर सहेजे जाते हैं।</string>
+    <string name="spotify_import_invalid">यह Spotify प्लेलिस्ट का लिंक नहीं है।</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Spotify प्लेलिस्ट पढ़ी जा रही है…</string>
+    <string name="spotify_import_matching">गाने मिलाए जा रहे हैं %1$d / %2$d</string>
+    <string name="spotify_import_none">इनमें से कोई भी गाना YouTube Music पर नहीं मिला।</string>
+    <string name="spotify_import_failed">प्लेलिस्ट इम्पोर्ट नहीं हो सकी: %1$s</string>
+    <string name="spotify_import_button">इम्पोर्ट करें</string>
+    <string name="spotify_import_local_fallback">इसे YouTube Music पर नहीं बनाया जा सका, इसलिए “%1$s” को इस डिवाइस पर सहेजा गया।</string>
+    <string name="spotify_import_done">“%1$s” इम्पोर्ट हो गई</string>
+    <string name="spotify_import_unmatched">%1$d गाने YouTube Music पर नहीं मिले</string>
+    <string name="local_playlist_subtitle">%1$d गाने · इस डिवाइस पर</string>
+    <string name="spotify_import_empty_playlist">इस प्लेलिस्ट में कोई गाना नहीं है</string>
 </resources>

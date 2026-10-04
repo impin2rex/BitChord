@@ -1231,4 +1231,26 @@
     <string name="song_cache_unlimited_subtitle">ไม่มีขีดจำกัด เสียงในแคชอาจเพิ่มขึ้นจนพื้นที่จัดเก็บเต็ม</string>
     <string name="clear_song_cache_title">ล้างแคชเพลงใช่ไหม</string>
     <string name="clear_song_cache_warning">เพลงในแคชทั้งหมดจะถูกลบและโฟลเดอร์เพลงในแคชจะว่างเปล่า เพลงจะสตรีมใหม่ในครั้งถัดไปที่เล่น</string>
+    <string name="recent_album">อัลบั้มล่าสุด</string>
+    <string name="recent_single">ซิงเกิลล่าสุด</string>
+    <string name="recent_ep">EP ล่าสุด</string>
+    <string name="lossless_output_permission_denied">สิทธิ์อุปกรณ์ใกล้เคียงปิดอยู่</string>
+    <string name="lossless_output_permission_denied_detail">แตะเพื่อเปิดการตั้งค่าและอนุญาตอุปกรณ์ใกล้เคียง — หากไม่อนุญาต เราจะอ่านโคเดก Bluetooth ของคุณไม่ได้</string>
+    <string name="import_spotify">นำเข้าจาก Spotify</string>
+    <string name="import_spotify_subtitle">จากลิงก์เพลย์ลิสต์</string>
+    <string name="spotify_import_title">นำเข้าเพลย์ลิสต์ Spotify</string>
+    <string name="spotify_import_description">วางลิงก์เพลย์ลิสต์สาธารณะ เพลงจะถูกจับคู่บน YouTube Music</string>
+    <string name="spotify_import_description_local">วางลิงก์เพลย์ลิสต์สาธารณะ เพลงจะถูกจับคู่บน YouTube Music และบันทึกไว้ในอุปกรณ์นี้</string>
+    <string name="spotify_import_invalid">นั่นไม่ใช่ลิงก์เพลย์ลิสต์ Spotify</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">กำลังอ่านเพลย์ลิสต์ Spotify…</string>
+    <string name="spotify_import_matching">กำลังจับคู่เพลง %1$d จาก %2$d</string>
+    <string name="spotify_import_none">ไม่พบเพลงเหล่านั้นบน YouTube Music เลย</string>
+    <string name="spotify_import_failed">นำเข้าเพลย์ลิสต์ไม่ได้: %1$s</string>
+    <string name="spotify_import_button">นำเข้า</string>
+    <string name="spotify_import_local_fallback">สร้างบน YouTube Music ไม่ได้ จึงบันทึก “%1$s” ไว้ในอุปกรณ์นี้แทน</string>
+    <string name="spotify_import_done">นำเข้า “%1$s” แล้ว</string>
+    <string name="spotify_import_unmatched">ไม่พบ %1$d เพลงบน YouTube Music</string>
+    <string name="local_playlist_subtitle">%1$d เพลง · ในอุปกรณ์นี้</string>
+    <string name="spotify_import_empty_playlist">ไม่มีเพลงในเพลย์ลิสต์นี้</string>
 </resources>

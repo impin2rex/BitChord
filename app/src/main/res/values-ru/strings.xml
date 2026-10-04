@@ -1274,4 +1274,26 @@
     <string name="song_cache_unlimited_subtitle">Без ограничений. Кэшированное аудио может расти, пока не заполнится память.</string>
     <string name="clear_song_cache_title">Очистить кэш треков?</string>
     <string name="clear_song_cache_warning">Все кэшированные треки будут удалены, а папка кэшированных треков опустеет. При следующем воспроизведении они снова будут загружаться потоком.</string>
+    <string name="recent_album">Новый альбом</string>
+    <string name="recent_single">Новый сингл</string>
+    <string name="recent_ep">Новый EP</string>
+    <string name="lossless_output_permission_denied">Разрешение «Устройства поблизости» отключено</string>
+    <string name="lossless_output_permission_denied_detail">Нажмите, чтобы открыть настройки и разрешить «Устройства поблизости» — без этого мы не можем определить кодек Bluetooth</string>
+    <string name="import_spotify">Импорт из Spotify</string>
+    <string name="import_spotify_subtitle">По ссылке на плейлист</string>
+    <string name="spotify_import_title">Импорт плейлиста Spotify</string>
+    <string name="spotify_import_description">Вставьте ссылку на публичный плейлист. Треки подбираются в YouTube Music.</string>
+    <string name="spotify_import_description_local">Вставьте ссылку на публичный плейлист. Треки подбираются в YouTube Music и сохраняются на этом устройстве.</string>
+    <string name="spotify_import_invalid">Это не ссылка на плейлист Spotify.</string>
+    <string name="spotify_import_hint">open.spotify.com/playlist/…</string>
+    <string name="spotify_import_fetching">Чтение плейлиста Spotify…</string>
+    <string name="spotify_import_matching">Подбор треков: %1$d из %2$d</string>
+    <string name="spotify_import_none">Ни один из этих треков не найден в YouTube Music.</string>
+    <string name="spotify_import_failed">Не удалось импортировать плейлист: %1$s</string>
+    <string name="spotify_import_button">Импортировать</string>
+    <string name="spotify_import_local_fallback">Не удалось создать его в YouTube Music, поэтому «%1$s» сохранён на этом устройстве.</string>
+    <string name="spotify_import_done">Импортирован «%1$s»</string>
+    <string name="spotify_import_unmatched">Не найдено в YouTube Music: %1$d треков</string>
+    <string name="local_playlist_subtitle">%1$d треков · На этом устройстве</string>
+    <string name="spotify_import_empty_playlist">В этом плейлисте нет треков</string>
 </resources>
