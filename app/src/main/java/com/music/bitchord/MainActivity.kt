@@ -132,6 +132,7 @@ import com.music.bitchord.data.model.SearchFilter
 import com.music.bitchord.data.model.SearchResult
 import com.music.bitchord.data.model.ShelfItem
 import com.music.bitchord.data.model.Song
+import com.music.bitchord.data.model.isUnresolvedSpotify
 import com.music.bitchord.data.model.UiState
 import com.music.bitchord.data.model.EntityType
 import com.music.bitchord.data.model.SearchHistoryEntity
@@ -152,6 +153,7 @@ import com.music.bitchord.ui.screens.EqualizerScreen
 import com.music.bitchord.ui.screens.HistoryScreen
 import com.music.bitchord.ui.screens.LibraryReplayEntry
 import com.music.bitchord.ui.screens.libraryDeviceItems
+import com.music.bitchord.ui.screens.SPOTIFY_BROWSE_ID
 import com.music.bitchord.ui.screens.libraryLinks
 import com.music.bitchord.ui.screens.CACHE_FOLDER_BROWSE_ID
 import com.music.bitchord.ui.screens.ListenTogetherScreen
@@ -159,7 +161,10 @@ import com.music.bitchord.ui.screens.PartyServerEditor
 import com.music.bitchord.ui.screens.SettingsScreen
 import com.music.bitchord.ui.screens.SourceEditorAlert
 import com.music.bitchord.ui.screens.SourcesScreen
+import com.music.bitchord.data.sources.TrackMatcher
 import com.music.bitchord.ui.screens.SpotifyCanvasAuthScreen
+import com.music.bitchord.ui.screens.SpotifyLibraryScreen
+import com.music.bitchord.data.spotify.SPOTIFY_PAGE_PREFIX
 import com.music.bitchord.playback.AudioCache
 import com.music.bitchord.playback.LinkRequest
 import com.music.bitchord.playback.MusicLink
@@ -578,6 +583,7 @@ private fun BitChordApp(
     // The alerts live out here rather than on the page because their scrim has
     // to cover the tab bar and mini player, which are drawn after it.
     var showDiscord by remember { mutableStateOf(false) }
+    var showSpotify by remember { mutableStateOf(false) }
     var showDiscordLogin by remember { mutableStateOf(false) }
     var discordDialog by remember { mutableStateOf<DiscordDialog?>(null) }
     var songActions by remember { mutableStateOf<Song?>(null) }
@@ -715,6 +721,7 @@ private fun BitChordApp(
         showEqualizer = false
         showHistory = false
         showDiscord = false
+        showSpotify = false
         libraryShowAll = null
         viewModel.clearDetail()
         webSession = null
@@ -778,6 +785,7 @@ private fun BitChordApp(
     LaunchedEffect(showSettings) {
         if (!showSettings) {
             showAccountScrobbling = false
+            showSpotify = false
         }
     }
 
@@ -1239,7 +1247,12 @@ private fun BitChordApp(
         }
     }
 
-    val playFrom: (List<Song>, Int, QueueSource) -> Unit = { songs, index, source ->
+    val playFrom: (List<Song>, Int, QueueSource) -> Unit = playFrom@{ allSongs, allIndex, source ->
+        // A Spotify page lists songs it has not found on YouTube Music yet (or
+        // never will); those can't be queued, so play the rest in their order.
+        if (allSongs.getOrNull(allIndex)?.isUnresolvedSpotify == true) return@playFrom
+        val songs = allSongs.filterNot { it.isUnresolvedSpotify }
+        val index = songs.indexOf(allSongs.getOrNull(allIndex)).coerceAtLeast(0)
         playRequestGeneration++
         activeRadioSeed = null
         scope.launch {
@@ -1896,6 +1909,10 @@ private fun BitChordApp(
     // card opens the same way from either.
     val onLibraryItemClick: (ShelfItem) -> Unit = { item ->
         item.browseId?.let { id ->
+            if (id == SPOTIFY_BROWSE_ID) {
+                showSpotify = true
+                return@let
+            }
             if ((id == "local:all" || id == "local:downloads") && !LocalMediaRepository.hasStoragePermission(context)) {
                 mediaPermissionLauncher.launch(mediaPermission)
             }
@@ -2310,6 +2327,7 @@ private fun BitChordApp(
                 settingsSubScreen = null
                 showHistory = false
                 showDiscord = false
+                showSpotify = false
                 libraryShowAll = null
 
                 when (sourceType) {
@@ -2400,7 +2418,10 @@ private fun BitChordApp(
         BackHandler(enabled = showDiscord) {
             showDiscord = false
         }
-        BackHandler(enabled = showAccountScrobbling && !showDiscord) {
+        BackHandler(enabled = showSpotify && detail == null) {
+            showSpotify = false
+        }
+        BackHandler(enabled = showAccountScrobbling && !showDiscord && !showSpotify) {
             showAccountScrobbling = false
             if (settingsSubScreen == "account_scrobbling") settingsSubScreen = null
         }
@@ -2419,7 +2440,7 @@ private fun BitChordApp(
         // One back step out of Settings, or out of any tab but Home, lands on
         // Home rather than exiting — only Home itself hands back to the system,
         // which is what actually closes/minimizes the app.
-        BackHandler(enabled = showSettings && !showAccountScrobbling && !showSources && !showListenTogether && !showEqualizer && !showReplay) {
+        BackHandler(enabled = showSettings && !showSpotify && !showAccountScrobbling && !showSources && !showListenTogether && !showEqualizer && !showReplay) {
             showSettings = false
             // Only when Settings was the whole of what was on screen. Opened
             // over Replay or over a release page, closing it reveals that again
@@ -2427,7 +2448,7 @@ private fun BitChordApp(
             if (detail == null && !showReplay) selectedTab = TAB_HOME
         }
         BackHandler(
-            enabled = detail == null && !showSettings && !showAccountScrobbling &&
+            enabled = detail == null && !showSettings && !showAccountScrobbling && !showSpotify &&
                 !showSources && !showListenTogether && !showEqualizer && !showReplay && selectedMoodGenre == null &&
                 selectedTab != TAB_HOME,
         ) {
@@ -2455,6 +2476,7 @@ private fun BitChordApp(
             Box(Modifier.weight(1f).fillMaxHeight()) {
                 AnimatedContent(
                     targetState = when {
+                        showSpotify && detail == null -> "spotify"
                         showDiscord -> "discord"
                         showHistory -> "history"
                         // `&& detail == null`: a card opened from the grid
@@ -2622,6 +2644,19 @@ private fun BitChordApp(
                             listState = replayListState,
                             landingPage = replayLandingPage,
                         )
+                    } else if (key == "spotify") {
+                        SpotifyLibraryScreen(
+                            onOpenPlaylist = { playlist ->
+                                viewModel.openDetail(
+                                    browseId = SPOTIFY_PAGE_PREFIX + playlist.id,
+                                    title = playlist.name,
+                                    subtitle = playlist.owner ?: context.getString(R.string.spotify),
+                                    thumbnailUrl = playlist.imageUrl,
+                                    type = BrowseType.PLAYLIST,
+                                )
+                            },
+                            contentPadding = listPadding,
+                        )
                     } else if (key == "discord") {
                         DiscordScreen(
                             song = player.song,
@@ -2649,6 +2684,7 @@ private fun BitChordApp(
                             onOpenListenBrainzLogin = { showListenBrainzLogin = true },
                             onOpenLastfmLogin = { showLastfmLogin = true },
                             onOpenDiscord = { showDiscord = true },
+                            onOpenSpotify = { showSpotify = true },
                             contentPadding = listPadding,
                         )
                     } else if (key == "sources") {
@@ -3190,7 +3226,7 @@ private fun BitChordApp(
                 // these pages had no status-bar scrim, title or back button, and
                 // Discord (pushed over Account) was covered by the page it opened
                 // from — hence skipped while it is up.
-                when (settingsSubScreen.takeUnless { showDiscord }) {
+                when (settingsSubScreen.takeUnless { showDiscord || showSpotify }) {
                     "account_scrobbling" -> {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
@@ -3213,6 +3249,7 @@ private fun BitChordApp(
                                 onOpenListenBrainzLogin = { showListenBrainzLogin = true },
                                 onOpenLastfmLogin = { showLastfmLogin = true },
                                 onOpenDiscord = { showDiscord = true },
+                                onOpenSpotify = { showSpotify = true },
                                 contentPadding = listPadding,
                             )
                         }
@@ -3345,6 +3382,7 @@ private fun BitChordApp(
 
                 FrostedTopBar(
                     title = when {
+                        showSpotify && detail == null -> stringResource(R.string.spotify)
                         showDiscord -> "Discord"
                         showHistory -> stringResource(R.string.history)
                         libraryShowAll != null && detail == null -> libraryShowAll?.title.orEmpty()
@@ -3385,6 +3423,7 @@ private fun BitChordApp(
                     refreshing = currentFeed != null && currentFeed in refreshing,
                     pullFraction = { currentPull?.distanceFraction ?: 0f },
                     onBack = when {
+                        showSpotify && detail == null -> ({ showSpotify = false })
                         showDiscord -> ({ showDiscord = false })
                         showHistory -> ({ showHistory = false })
                         libraryShowAll != null && detail == null -> ({ libraryShowAll = null })
