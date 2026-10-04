@@ -61,6 +61,8 @@ kotlin {
 }
 
 android {
+    // lintVital (run on every release build) prints Kotlin-metadata errors: AGP 8.10 lint embeds Kotlin 2.1. Full `lint` still runs on demand.
+    lint { checkReleaseBuilds = false }
     namespace = "com.music.bitchord.shared"
     compileSdk = 36
 }
