@@ -1,5 +1,6 @@
 package com.music.bitchord.playback.audio
 
+import androidx.media3.common.audio.AudioProcessor
 import com.music.bitchord.playback.EqCurve
 import com.music.bitchord.playback.EqLayout
 import com.music.bitchord.playback.EqualizerProcessor
@@ -37,7 +38,7 @@ class FloatDspChainTest {
         val qs = FloatArray(EqLayout.SLOTS) { 0.707f }
         gains[3] = 6.0f // 1000 Hz bell (slot 3)
         eq.setTuning(enabled = true, EqCurve(gains, qs, 0f), balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 256
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)
@@ -66,7 +67,7 @@ class FloatDspChainTest {
         val targetSlot = 3 // 1000 Hz bell (slot 3 in EqLayout)
         gains[targetSlot] = boostDb
         eq.setTuning(enabled = true, EqCurve(gains, qs, 0f), balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         // Generate 1 kHz sine wave
         val frames = 4096
@@ -104,7 +105,7 @@ class FloatDspChainTest {
         gains[0] = 6.0f // 60 Hz shelf
         gains[9] = 6.0f // 14 kHz shelf
         eq.setTuning(enabled = true, EqCurve(gains, qs, 0f), balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 1024
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)
@@ -132,7 +133,7 @@ class FloatDspChainTest {
         val eq = EqualizerProcessor()
         eq.configure(sampleRate, 2)
         eq.setTuning(enabled = false, EqCurve.FLAT, balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 64
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)
@@ -156,7 +157,7 @@ class FloatDspChainTest {
         val gains = FloatArray(EqLayout.SLOTS) { 3f }
         val qs = FloatArray(EqLayout.SLOTS) { 0.707f }
         eq.setTuning(enabled = true, EqCurve(gains, qs, 0f), balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 256
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)
@@ -185,7 +186,7 @@ class FloatDspChainTest {
         val qs = FloatArray(EqLayout.SLOTS) { 0.707f }
         gains[5] = 6.0f
         eq.setTuning(enabled = true, EqCurve(gains, qs, 0f), balance = 0f)
-        eq.flush()
+        eq.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 128
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)
@@ -260,7 +261,7 @@ class FloatDspChainTest {
         val transition = TransitionFilterProcessor()
         transition.configure(sampleRate, 2)
         transition.setCutoffs(lowPassHz = 500f, highPassHz = TransitionFilterProcessor.OFF_HZ)
-        transition.flush()
+        transition.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         // Feed 5 kHz sine wave
         val frames = 1024
@@ -289,7 +290,7 @@ class FloatDspChainTest {
         val transition = TransitionFilterProcessor()
         transition.configure(sampleRate, 2)
         transition.setCutoffs(lowPassHz = TransitionFilterProcessor.OPEN_HZ, highPassHz = 2000f)
-        transition.flush()
+        transition.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         // Feed 100 Hz sine wave
         val frames = 1024
@@ -317,7 +318,7 @@ class FloatDspChainTest {
         val transition = TransitionFilterProcessor()
         transition.configure(sampleRate, 2)
         transition.open()
-        transition.flush()
+        transition.flush(AudioProcessor.StreamMetadata.DEFAULT)
 
         val frames = 64
         val block = AudioBlock(channelCount = 2, capacityFrames = frames)

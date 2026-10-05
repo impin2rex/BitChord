@@ -67,7 +67,7 @@ val listenTogetherServer: String = (
  * comes. Blanking this line is the one step that turns a beta into a release,
  * so it is the one place to get right.
  */
-val betaSuffix = "beta2"
+val betaSuffix = ""
 
 android {
     // lintVital (run on every release build) prints Kotlin-metadata errors: AGP 8.10 lint embeds Kotlin 2.1. Full `lint` still runs on demand.
@@ -81,8 +81,8 @@ android {
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "1.7.1"
+        versionCode = 26
+        versionName = "1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -282,6 +282,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    // ProcessLifecycleOwner: whether the app is on screen, for the open-app count.
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")

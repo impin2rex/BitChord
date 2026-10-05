@@ -265,7 +265,7 @@ class AudioPipelineTelemetryTest {
             AudioFormat.ENCODING_PCM_16BIT -> "PCM16"
             else -> null
         }
-        val audioTrackRate = actualSampleRateHz
+        val audioTrackRate: Int? = actualSampleRateHz
         val audioTrackText = when {
             audioTrackEncoding != null && audioTrackRate != null -> "$audioTrackEncoding / $audioTrackRate Hz"
             audioTrackEncoding != null -> audioTrackEncoding

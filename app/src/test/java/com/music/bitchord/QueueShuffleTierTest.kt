@@ -95,7 +95,7 @@ class QueueShuffleTierTest {
                 "replaceMediaItems" -> {
                     val from = args[0] as Int
                     val to = args[1] as Int
-                    val newItems = args[2] as List<androidx.media3.common.MediaItem>
+                    @Suppress("UNCHECKED_CAST") val newItems = args[2] as List<androidx.media3.common.MediaItem>
                     for (i in (to - 1) downTo from) {
                         items.removeAt(i)
                     }

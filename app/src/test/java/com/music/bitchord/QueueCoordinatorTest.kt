@@ -494,7 +494,7 @@ class QueueCoordinatorTest {
                 "getMediaItemAt" -> items[args[0] as Int]
                 "getCurrentMediaItem" -> items.getOrNull(activeIndex)
                 "setMediaItems" -> {
-                    val newItems = args[0] as List<MediaItem>
+                    @Suppress("UNCHECKED_CAST") val newItems = args[0] as List<MediaItem>
                     val startIndex = args[1] as Int
                     items.clear()
                     items.addAll(newItems)
