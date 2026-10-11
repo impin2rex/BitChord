@@ -490,7 +490,7 @@
     <string name="upgrade_length_slack_footer">Daha büyük tolerans daha fazla kaynak eşleşmesi kabul eder; daha küçük tolerans daha katıdır. Varsayılan 3 saniyedir.</string>
     <string name="seconds_short">%1$d sn</string>
     <string name="spdc_token">sp_dc belirteci</string>
-    <string name="spotify_canvas_setup">Spotify Canvas kurulumu</string>
+    <string name="spotify_canvas_setup">Spotify\'ı ayarla</string>
     <string name="spotify_canvas_setup_description">Spotify Canvas\'ı kullanmak için Spotify sp_dc çerezinizi girin.</string>
     <string name="spotify_canvas_setup_steps">1. Bir tarayıcıda open.spotify.com\'a giriş yapın.\n2. Geliştirici Araçları\'nı, ardından Uygulama ve Çerezler\'i açın.\n3. sp_dc çerezinin değerini kopyalayın.\n4. Aşağıya yapıştırın.</string>
     <string name="spotify_canvas_auto_hide">Oynatıcı kontrollerini otomatik gizle</string>
@@ -1244,5 +1244,25 @@
     <string name="spotify_import_unmatched">%1$d şarkı YouTube Music’de bulunamadı</string>
     <string name="spotify_library_subtitle">Spotify çalma listeleriniz</string>
     <string name="spotify_sign_in">Spotify ile oturum aç</string>
+    <string name="spotify_use_spdc_token">sp_dc token\'ı kullan</string>
     <string name="spotify_track_unavailable">O şarkı YouTube Music’de bulunamadı</string>
+    <string name="chinese_simplified">Çince (Basitleştirilmiş)</string>
+    <string name="chinese_traditional">Çince (Geleneksel)</string>
+    <string name="show_queue_history">Sıra geçmişini göster</string>
+    <string name="show_queue_history_subtitle">Sırada Şimdi çalıyor\'un üstünde daha önce çalınan en fazla 25 şarkıyı gösterir</string>
+    <string name="not_enough_this_week">Replay\'ini açmak için bu hafta birkaç şarkı daha dinle.</string>
+    <string name="replay_artist_start_week">Bu hafta </string>
+    <string name="replay_songs_end_week"> haftanı doldurdu.</string>
+    <string name="replay_summary_end_week">hafta</string>
+    <string name="replay_this_week">Bu hafta</string>
+    <string name="onboarding_title">Milyonlarca şarkı, BitChord\'da dinle</string>
+    <string name="onboarding_name_prompt">Sana nasıl hitap edelim?</string>
+    <string name="onboarding_name_hint">Adın</string>
+    <string name="onboarding_name_footer">Birlikte Dinle sırasında arkadaşların bunu görür. Daha sonra Ayarlar\'dan değiştirebilirsin.</string>
+    <string name="onboarding_next">İleri</string>
+    <string name="onboarding_connect_title">YouTube hesabını bağla</string>
+    <string name="onboarding_connect_body">Kitaplığını, çalma listelerini ve mikslerini getir, arkadaşlarınla Birlikte Dinle oturumu başlat.</string>
+    <string name="onboarding_sign_in_google">Google ile oturum aç</string>
+    <string name="onboarding_skip_sign_in">Oturum açmayı atla</string>
+    <string name="onboarding_back">Geri</string>
 </resources>

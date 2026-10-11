@@ -1,0 +1,49 @@
+name: macOS arm64 DMG
+
+on:
+  push:
+    branches: [development]
+  workflow_dispatch:
+
+concurrency:
+  group: macos-dmg-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-dmg:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: gradle
+
+    # Same number the Android build ships, so both artifacts from one push match.
+    - name: Work out the version
+      id: version
+      run: |
+        version=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
+        echo "value=$version" >> "$GITHUB_OUTPUT"
+        echo "Building $version"
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Tests
+      run: ./gradlew :shared:jvmTest :desktopApp:test -Pbitchord.version=${{ steps.version.outputs.value }}
+
+    - name: Build DMG
+      run: ./gradlew :desktopApp:packageDmg -Pbitchord.version=${{ steps.version.outputs.value }}
+
+    - name: Upload DMG Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bitchord-macos-arm64-dmg
+        path: desktopApp/build/compose/binaries/main/dmg/*.dmg
+        if-no-files-found: error

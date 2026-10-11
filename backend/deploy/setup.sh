@@ -4,6 +4,9 @@
 #
 #   sudo DOMAIN=jam.bitchord.kushagrasingh.in bash deploy/setup.sh
 #
+# First run on a fresh VM also takes DEPLOY_PUBKEY (the public half of the
+# GitHub Actions deploy key) to create the restricted `deploy` user.
+#
 # Run it from the backend/ directory of a checkout on the VM. The DNS A record
 # for $DOMAIN must already point at this VM, or Caddy cannot get a certificate.
 set -euo pipefail
@@ -42,9 +45,12 @@ install -m 644 "$BACKEND_DIR/deploy/bitchord-jam.service" /etc/systemd/system/bi
 systemctl daemon-reload
 systemctl enable bitchord-jam
 systemctl restart bitchord-jam
-install -m 644 "$BACKEND_DIR/deploy/bitchord-keepalive.service" /etc/systemd/system/bitchord-keepalive.service
-systemctl daemon-reload
-systemctl enable --now bitchord-keepalive
+# The CPU keepalive burner is retired; clean it off VMs that still have it.
+if [ -f /etc/systemd/system/bitchord-keepalive.service ]; then
+  systemctl disable --now bitchord-keepalive || true
+  rm -f /etc/systemd/system/bitchord-keepalive.service
+  systemctl daemon-reload
+fi
 
 echo "== caddy (HTTPS + WebSocket proxy)"
 if ! command -v caddy >/dev/null; then
@@ -57,10 +63,53 @@ if ! cmp -s /tmp/Caddyfile /etc/caddy/Caddyfile; then
   mv /tmp/Caddyfile /etc/caddy/Caddyfile
   systemctl reload caddy || systemctl restart caddy
 fi
+# Hard memory cap so a runaway Caddy is killed and restarted alone rather than the
+# whole 1 GB VM thrashing swap. No soft GOMEMLIMIT: a limit below the working set
+# made the Go GC run flat out on a CPU the hypervisor was already starving.
+install -d /etc/systemd/system/caddy.service.d
+cat > /etc/systemd/system/caddy.service.d/memory.conf <<'UNIT'
+[Service]
+MemoryMax=750M
+Restart=always
+RestartSec=2
+UNIT
+systemctl daemon-reload
 
 echo "== deploy hook"
 echo "$DOMAIN" > /etc/bitchord-domain
 install -m 755 "$BACKEND_DIR/deploy/bitchord-deploy.sh" /usr/local/sbin/bitchord-deploy
+
+if [ -n "${DEPLOY_PUBKEY:-}" ]; then
+  echo "== deploy user"
+  # The GitHub Actions key may only run the deploy hook (forced command).
+  id deploy >/dev/null 2>&1 || useradd --create-home --shell /bin/bash deploy
+  install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+  printf 'command="sudo /usr/local/sbin/bitchord-deploy",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty %s\n' "$DEPLOY_PUBKEY" > /home/deploy/.ssh/authorized_keys
+  chown deploy:deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
+  echo 'deploy ALL=(root) NOPASSWD: /usr/local/sbin/bitchord-deploy' > /etc/sudoers.d/bitchord-deploy
+  chmod 440 /etc/sudoers.d/bitchord-deploy && visudo -cf /etc/sudoers.d/bitchord-deploy
+fi
+
+echo "== kernel network limits"
+# The micro VM's default conntrack table is tiny (7680) and keeps an idle
+# established TCP flow for five days, which is how a crowd of phones that
+# vanish without a FIN would fill it. Give it room and a one-hour memory.
+cat > /etc/sysctl.d/90-bitchord.conf <<'SYSCTL'
+net.netfilter.nf_conntrack_max = 65536
+net.netfilter.nf_conntrack_tcp_timeout_established = 3600
+SYSCTL
+# Load the module at boot, or systemd-sysctl runs before it exists and the limit is lost.
+echo nf_conntrack > /etc/modules-load.d/nf_conntrack.conf
+sysctl --system >/dev/null 2>&1 || true
+
+echo "== swap"
+# 1 GB of RAM and no swap meant a connection spike could get Caddy OOM-killed.
+if ! swapon --show --noheadings | grep -q .; then
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+echo 'vm.swappiness = 1' > /etc/sysctl.d/91-bitchord-swap.conf
+sysctl -q -p /etc/sysctl.d/91-bitchord-swap.conf || true
 
 echo "== firewall"
 # Oracle's Ubuntu images ship an iptables REJECT rule that blocks everything

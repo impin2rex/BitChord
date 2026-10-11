@@ -423,7 +423,7 @@
     <string name="upgrade_length_slack_footer">Większa tolerancja akceptuje więcej dopasowań ze źródeł; mniejsza jest bardziej rygorystyczna. Domyślnie 3 sekundy.</string>
     <string name="seconds_short">%1$d s</string>
     <string name="spdc_token">Token sp_dc</string>
-    <string name="spotify_canvas_setup">Konfiguracja Spotify Canvas</string>
+    <string name="spotify_canvas_setup">Skonfiguruj Spotify</string>
     <string name="spotify_canvas_setup_description">Aby korzystać ze Spotify Canvas, podaj plik cookie sp_dc ze Spotify.</string>
     <string name="spotify_canvas_setup_steps">1. Zaloguj się na open.spotify.com w przeglądarce.
 2. Otwórz Narzędzia deweloperskie &gt; Application &gt; Cookies.
@@ -1327,5 +1327,25 @@
     <string name="spotify_import_unmatched">%1$d utworów nie znaleziono w YouTube Music</string>
     <string name="spotify_library_subtitle">Twoje playlisty Spotify</string>
     <string name="spotify_sign_in">Zaloguj się przez Spotify</string>
+    <string name="spotify_use_spdc_token">Użyj tokena sp_dc</string>
     <string name="spotify_track_unavailable">Nie znaleziono tego utworu w YouTube Music</string>
+    <string name="chinese_simplified">Chiński (uproszczony)</string>
+    <string name="chinese_traditional">Chiński (tradycyjny)</string>
+    <string name="show_queue_history">Pokaż historię kolejki</string>
+    <string name="show_queue_history_subtitle">Pokazuje do 25 wcześniej odtworzonych utworów nad Teraz odtwarzane w kolejce</string>
+    <string name="not_enough_this_week">Odtwórz jeszcze kilka utworów w tym tygodniu, aby odblokować swój Replay.</string>
+    <string name="replay_artist_start_week">W tym tygodniu </string>
+    <string name="replay_songs_end_week"> wypełniły Twój tydzień.</string>
+    <string name="replay_summary_end_week">tydzień</string>
+    <string name="replay_this_week">Ten tydzień</string>
+    <string name="onboarding_title">Miliony utworów, słuchaj w BitChord</string>
+    <string name="onboarding_name_prompt">Jak mamy się do Ciebie zwracać?</string>
+    <string name="onboarding_name_hint">Twoje imię</string>
+    <string name="onboarding_name_footer">Znajomi zobaczą to podczas wspólnego słuchania. Możesz to później zmienić w Ustawieniach.</string>
+    <string name="onboarding_next">Dalej</string>
+    <string name="onboarding_connect_title">Połącz konto YouTube</string>
+    <string name="onboarding_connect_body">Zabierz ze sobą bibliotekę, playlisty i miksy oraz rozpocznij wspólne słuchanie ze znajomymi.</string>
+    <string name="onboarding_sign_in_google">Zaloguj się przez Google</string>
+    <string name="onboarding_skip_sign_in">Pomiń logowanie</string>
+    <string name="onboarding_back">Wstecz</string>
 </resources>

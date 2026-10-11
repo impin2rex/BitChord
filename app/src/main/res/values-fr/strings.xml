@@ -462,7 +462,7 @@
     <string name="upgrade_length_slack_footer">Une tolérance plus large accepte plus de correspondances ; une tolérance plus faible est plus stricte. La valeur par défaut est de 3 secondes.</string>
     <string name="seconds_short">%1$d s</string>
     <string name="spdc_token">Jeton sp_dc</string>
-    <string name="spotify_canvas_setup">Configuration de Spotify Canvas</string>
+    <string name="spotify_canvas_setup">Configurer Spotify</string>
     <string name="spotify_canvas_setup_description">Pour utiliser Spotify Canvas, indiquez votre cookie sp_dc Spotify.</string>
     <string name="spotify_canvas_setup_steps">1. Connectez-vous sur open.spotify.com dans un navigateur.\n2. Ouvrez les outils de développement, puis Application et Cookies.\n3. Copiez la valeur du cookie sp_dc.\n4. Collez-la ci-dessous.</string>
     <string name="spotify_canvas_auto_hide">Masquer automatiquement les commandes</string>
@@ -1288,5 +1288,25 @@
     <string name="spotify_import_unmatched">%1$d titres n’ont pas été trouvés sur YouTube Music</string>
     <string name="spotify_library_subtitle">Vos playlists Spotify</string>
     <string name="spotify_sign_in">Se connecter avec Spotify</string>
+    <string name="spotify_use_spdc_token">Utiliser un jeton sp_dc</string>
     <string name="spotify_track_unavailable">Impossible de trouver ce titre sur YouTube Music</string>
+    <string name="chinese_simplified">Chinois (simplifié)</string>
+    <string name="chinese_traditional">Chinois (traditionnel)</string>
+    <string name="show_queue_history">Afficher l\'historique de la file</string>
+    <string name="show_queue_history_subtitle">Affiche jusqu\'à 25 titres déjà lus au-dessus de En cours de lecture dans la file</string>
+    <string name="not_enough_this_week">Écoutez encore quelques titres cette semaine pour débloquer votre Replay.</string>
+    <string name="replay_artist_start_week">Cette semaine, </string>
+    <string name="replay_songs_end_week"> ont rempli votre semaine.</string>
+    <string name="replay_summary_end_week">semaine</string>
+    <string name="replay_this_week">Cette semaine</string>
+    <string name="onboarding_title">Des millions de titres, à écouter sur BitChord</string>
+    <string name="onboarding_name_prompt">Comment doit-on vous appeler ?</string>
+    <string name="onboarding_name_hint">Votre nom</string>
+    <string name="onboarding_name_footer">Vos amis verront ce nom lors d\'une écoute commune. Vous pourrez le modifier plus tard dans les Paramètres.</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_connect_title">Connectez votre compte YouTube</string>
+    <string name="onboarding_connect_body">Retrouvez votre bibliothèque, vos playlists et vos mix, et lancez une écoute commune avec vos amis.</string>
+    <string name="onboarding_sign_in_google">Se connecter avec Google</string>
+    <string name="onboarding_skip_sign_in">Passer la connexion</string>
+    <string name="onboarding_back">Retour</string>
 </resources>

@@ -7,6 +7,7 @@ import android.media.audiofx.AudioEffect
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -67,6 +68,7 @@ import androidx.compose.material.icons.rounded.SignalCellularAlt
 import androidx.compose.material.icons.rounded.SmartDisplay
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.SurroundSound
+import androidx.compose.material.icons.rounded.Waves
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Waves
@@ -126,6 +128,10 @@ import coil3.compose.AsyncImage
 import com.music.bitchord.ui.components.isGlassSupported
 import com.music.bitchord.ui.components.languageDisplayNameRes
 import com.music.bitchord.ui.components.MessageState
+import com.music.bitchord.sharedui.resources.Res as SharedRes
+import com.music.bitchord.sharedui.resources.reverb
+import com.music.bitchord.sharedui.resources.reverb_subtitle
+import com.music.bitchord.ui.components.ReverbControls
 import com.music.bitchord.ui.components.SearchField
 import com.music.bitchord.ui.components.thumbnailBorder
 import com.music.bitchord.ui.icons.BitChordIcons
@@ -195,6 +201,8 @@ fun SettingsScreen(
     // which caches the codec-list walk for the life of the process.
     val dolbyAtmosSupported = DeviceCodecs.playsDolbyAtmos
     val spatialAudio by AppSettings.spatialAudio.collectAsStateWithLifecycle()
+    val reverbEnabled by AppSettings.reverbEnabled.collectAsStateWithLifecycle()
+    val reverb by AppSettings.reverb.collectAsStateWithLifecycle()
     val nerdStats by AppSettings.showNerdStats.collectAsStateWithLifecycle()
     val reduceAnimation by AppSettings.reduceAnimation.collectAsStateWithLifecycle()
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
@@ -225,6 +233,7 @@ fun SettingsScreen(
     val stopOnTaskRemoved by AppSettings.stopOnTaskRemoved.collectAsStateWithLifecycle()
     val hideVolumeBar by AppSettings.hideVolumeBar.collectAsStateWithLifecycle()
     val hideSongStatus by AppSettings.hideSongStatus.collectAsStateWithLifecycle()
+    val showQueueHistory by AppSettings.showQueueHistory.collectAsStateWithLifecycle()
     val swipeToPlayNext by AppSettings.swipeToPlayNext.collectAsStateWithLifecycle()
     val dontRepeatSuggestions by AppSettings.dontRepeatSuggestions.collectAsStateWithLifecycle()
     val preferMusicOnly by AppSettings.preferMusicOnly.collectAsStateWithLifecycle()
@@ -723,6 +732,35 @@ fun SettingsScreen(
                     },
                     onClick = { AppSettings.setSpatialAudio(!spatialAudio) },
                 )
+            }
+            // The switch and the room together, the room only while the
+            // switch is on — the player's audio-output sheet carries the same
+            // switch for flipping it mid-song, and this is where it is tuned.
+            val reverbTitle = org.jetbrains.compose.resources.stringResource(SharedRes.string.reverb)
+            row(reverbTitle, "room", "hall", "plate", "cathedral", "ambience") {
+                SettingsRow(
+                    icon = Icons.Rounded.Waves,
+                    title = reverbTitle,
+                    subtitle = org.jetbrains.compose.resources.stringResource(SharedRes.string.reverb_subtitle),
+                    trailing = {
+                        Switch(
+                            checked = reverbEnabled,
+                            onCheckedChange = AppSettings::setReverbEnabled,
+                            colors = SwitchDefaults.colors(
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                checkedBorderColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                    },
+                    onClick = { AppSettings.setReverbEnabled(!reverbEnabled) },
+                )
+                AnimatedVisibility(visible = reverbEnabled) {
+                    ReverbControls(
+                        settings = reverb,
+                        onChange = AppSettings::setReverb,
+                        modifier = Modifier.padding(start = ROW_INSET, end = ROW_INSET, bottom = 14.dp),
+                    )
+                }
             }
             // The system panel is not listed here as well. A device with a
             // Dolby or Dirac panel has something BitChord cannot reproduce and
@@ -1303,6 +1341,25 @@ fun SettingsScreen(
                     onClick = { AppSettings.setHideVolumeBar(!hideVolumeBar) },
                 )
             }
+            val showQueueHistoryTitle = stringResource(R.string.show_queue_history)
+            row(showQueueHistoryTitle, "player", "queue", "history", "previously played") {
+                SettingsRow(
+                    icon = Icons.Rounded.History,
+                    title = showQueueHistoryTitle,
+                    subtitle = stringResource(R.string.show_queue_history_subtitle),
+                    trailing = {
+                        Switch(
+                            checked = showQueueHistory,
+                            onCheckedChange = AppSettings::setShowQueueHistory,
+                            colors = SwitchDefaults.colors(
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                checkedBorderColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                    },
+                    onClick = { AppSettings.setShowQueueHistory(!showQueueHistory) },
+                )
+            }
             val hideSongStatusTitle = stringResource(R.string.hide_song_status)
             row(hideSongStatusTitle, "player", "playing from", "played by") {
                 SettingsRow(
@@ -1327,8 +1384,8 @@ fun SettingsScreen(
         SearchableSettingsGroup(search, header = stringResource(R.string.language)) {
             val appLanguageTitle = stringResource(R.string.app_language)
             row(appLanguageTitle, "locale", "translate") {
-                val selectedLanguage = AppCompatDelegate.getApplicationLocales().get(0)?.language
-                    ?: Locale.getDefault().language
+                val selectedLanguage = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
+                    ?: Locale.getDefault().toLanguageTag()
                 SettingsRow(
                     icon = Icons.Rounded.Language,
                     title = appLanguageTitle,
