@@ -12,6 +12,8 @@ concurrency:
 jobs:
   build-dmg:
     runs-on: macos-14
+    env:
+      LISTEN_TOGETHER_SERVER: ${{ secrets.LISTEN_TOGETHER_SERVER }}
 
     steps:
     - name: Checkout Repository

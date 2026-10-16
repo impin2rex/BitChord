@@ -12,6 +12,8 @@ concurrency:
 jobs:
   build-tv-prod-release:
     runs-on: ubuntu-latest
+    env:
+      LISTEN_TOGETHER_SERVER: ${{ secrets.LISTEN_TOGETHER_SERVER }}
 
     steps:
     - name: Checkout Repository

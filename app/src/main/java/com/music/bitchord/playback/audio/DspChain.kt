@@ -26,6 +26,8 @@ import com.music.bitchord.playback.TransitionFilterProcessor
  * player levels the track *it* is playing, so the two sides of a crossfade are
  * each levelled for their own song — see [LoudnessProcessor]. Last because its
  * limiter has to see the signal every other stage has finished shaping.
+ * That limiter is also the equaliser's: [EqualizerProcessor] only takes back
+ * half of a boost, and while it is shaping the signal the limiter stays on.
  *
  * ## Staying out of the way
  *
@@ -88,6 +90,9 @@ class DspChain(
         equalizer.process(block)
         reverb.process(block.samples, block.sampleCount)
         transition.process(block)
+        // The equaliser leaves its overs in place for the stages after it to
+        // see; the loudness stage's limiter is what catches whatever survives.
+        loudness.holdLimiter = equalizer.isShaping
         loudness.process(block)
     }
 
