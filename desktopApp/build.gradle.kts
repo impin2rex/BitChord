@@ -52,6 +52,7 @@ val desktopModuleIndexUrl = localProperty("MODULE_INDEX_URL")
 // Last.fm signs every request with these, so signing in from inside the app
 // needs them at hand. Supplied locally and never committed, as on Android.
 val listenTogetherServer = localProperty("LISTEN_TOGETHER_SERVER")
+val signatureApiUrl = localProperty("SIGNATURE_API_URL")
 val lastfmApiKey = localProperty("LASTFM_API_KEY")
 val lastfmSecret = localProperty("LASTFM_SECRET")
 
@@ -508,6 +509,9 @@ compose.desktop {
         }
         if (listenTogetherServer.isNotBlank()) {
             jvmArgs("-Dbitchord.listentogether.server=$listenTogetherServer")
+        }
+        if (signatureApiUrl.isNotBlank()) {
+            jvmArgs("-Dbitchord.signature.url=$signatureApiUrl")
         }
 
         buildTypes.release.proguard {

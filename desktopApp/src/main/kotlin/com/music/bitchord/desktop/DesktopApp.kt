@@ -5333,6 +5333,8 @@ private fun DesktopArtistPage(
                 val artist = state.data
                 val name = artist.name?.takeIf(String::isNotBlank) ?: fallbackName
                 val palette = rememberDesktopArtworkPalette(artist.thumbnailUrl)
+                // The name is billed in the artist's own hand when a signature API is set up.
+                val signature = rememberDesktopArtistSignature(name)
                 // Android caps the top-songs block and pages it sideways so the release shelves are
                 // not buried under a hundred rows.
                 val top = artist.songs.take(MAX_ARTIST_SONGS)
@@ -5342,7 +5344,7 @@ private fun DesktopArtistPage(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         item(key = "artist-header") {
-                            DesktopArtistBanner(artist.thumbnailUrl, name, palette)
+                            DesktopArtistBanner(artist.thumbnailUrl, name, palette, signature)
                         }
                         if (artist.subscriberCountText != null || artist.monthlyListenerCount != null) {
                             item(key = "artist-stats") {
@@ -5458,7 +5460,12 @@ private fun DesktopArtistPage(
 
 /** The photograph, and the name across the foot of it. */
 @Composable
-private fun DesktopArtistBanner(url: String?, name: String, palette: DesktopArtworkPalette) {
+private fun DesktopArtistBanner(
+    url: String?,
+    name: String,
+    palette: DesktopArtworkPalette,
+    signature: DesktopArtistSignature?,
+) {
     Box(Modifier.fillMaxWidth().height(ARTIST_BANNER_HEIGHT)) {
         DesktopArtwork(url, Modifier.matchParentSize(), px = HEADER_ART_PX)
         // Two washes rather than one.
@@ -5480,17 +5487,7 @@ private fun DesktopArtistBanner(url: String?, name: String, palette: DesktopArtw
                 ),
             ),
         )
-        Text(
-            name,
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = DesktopPageGutter, end = DesktopPageGutter, bottom = 18.dp),
-        )
+        DesktopArtistTitle(name, signature, ARTIST_BANNER_HEIGHT, DesktopPageGutter)
     }
 }
 
@@ -6262,6 +6259,7 @@ private fun DesktopSettingsScreen(
                         if (imagesCleared) "Image cache cleared" else "Frees space used by album artwork",
                     ) {
                         DesktopArtworkCache.clear()
+                        DesktopSignatureImages.clear()
                         imagesCleared = true
                     }
                 }
@@ -6450,6 +6448,28 @@ private fun DesktopSettingsScreen(
                         hideVolumeBar,
                         DesktopAppearanceSettings::setHideVolumeBar,
                     )
+                    val signatureEnabled by DesktopSignatureSettings.enabled.collectAsState()
+                    SettingsToggle(
+                        DesktopStrings["artist_signatures", "Artist signatures"],
+                        DesktopStrings[
+                            "artist_signatures_subtitle",
+                            "Shows a handwritten signature when Apple Music has no title logo",
+                        ],
+                        signatureEnabled,
+                        DesktopSignatureSettings::setEnabled,
+                    )
+                    var editingSignatureApi by remember { mutableStateOf(false) }
+                    if (signatureEnabled) {
+                        val signatureUrl by DesktopSignatureSettings.url.collectAsState()
+                        SettingsRow(
+                            Icons.Rounded.Edit,
+                            DesktopStrings["artist_signatures_url", "Signature API URL"],
+                            signatureUrl.ifBlank {
+                                DesktopStrings["artist_signatures_unconfigured", "Not configured — tap to set the API URL"]
+                            },
+                        ) { editingSignatureApi = true }
+                    }
+                    if (editingSignatureApi) DesktopSignatureApiDialog { editingSignatureApi = false }
                 }
             }
             if (section == DesktopSettingsSection.AUDIO_QUALITY) item {
