@@ -39,6 +39,7 @@ import com.music.bitchord.ui.tv.components.TvListRow
 import com.music.bitchord.ui.tv.dialogs.TvAboutDialog
 import com.music.bitchord.ui.tv.dialogs.TvEqualizerDialog
 import com.music.bitchord.ui.tv.dialogs.TvReverbDialog
+import com.music.bitchord.ui.tv.dialogs.TvSignatureApiDialog
 import com.music.bitchord.ui.tv.dialogs.TvLyricsSourcesDialog
 import com.music.bitchord.ui.tv.dialogs.TvRefreshRateDialog
 import com.music.bitchord.ui.tv.dialogs.TvScrobbleDialog
@@ -51,7 +52,7 @@ import com.music.bitchord.ui.tv.theme.TvGlass
 import com.music.bitchord.ui.tv.theme.TvType
 
 // Discord Rich Presence is hidden on TV for now; TvDiscordDialog is kept for when it returns.
-private enum class SettingsSheet { Theme, RefreshRate, Equalizer, Reverb, Scrobbling, LyricsSources, Update, About }
+private enum class SettingsSheet { Theme, RefreshRate, Equalizer, Reverb, Scrobbling, LyricsSources, SignatureApi, Update, About }
 
 private const val DefaultBlurb = "Playback, sound and display preferences for BitChord on this TV."
 
@@ -85,6 +86,8 @@ fun TvSettingsScreen(
     val canvas by AppSettings.animatedCanvas.collectAsState()
     val lyricsCanvas by TvSettings.tvLyricsCanvasEnabled.collectAsState()
     val nerdStats by AppSettings.showNerdStats.collectAsState()
+    val signatureEnabled by AppSettings.signatureApiEnabled.collectAsState()
+    val signatureUrl by AppSettings.signatureApiUrl.collectAsState()
     val themeId by TvSettings.tvTheme.collectAsState()
     val uiScale by TvSettings.tvUiScale.collectAsState()
     val refreshRate by TvRefreshRateController.preference.collectAsState()
@@ -265,6 +268,24 @@ fun TvSettingsScreen(
             }
             item {
                 TvListRow(
+                    title = "Artist Signatures",
+                    value = onOff(signatureEnabled),
+                    onFocused = { blurb = "Shows a handwritten signature on an artist's page when Apple Music has no title logo." },
+                    onClick = { AppSettings.setSignatureApiEnabled(!signatureEnabled) },
+                )
+            }
+            if (signatureEnabled) {
+                item {
+                    TvListRow(
+                        title = "Signature API",
+                        value = signatureUrl.removePrefix("https://").removePrefix("http://").ifBlank { "Not Set" },
+                        onFocused = { blurb = "The address of the artist-signature API to ask. Select to change it." },
+                        onClick = { sheet = SettingsSheet.SignatureApi },
+                    )
+                }
+            }
+            item {
+                TvListRow(
                     title = "Stats for Nerds",
                     value = onOff(nerdStats),
                     onFocused = { blurb = "Shows the codec, bitrate and sample rate of what's playing." },
@@ -363,6 +384,7 @@ fun TvSettingsScreen(
         SettingsSheet.Reverb -> TvReverbDialog(onDismiss = { sheet = null })
         SettingsSheet.Scrobbling -> TvScrobbleDialog(onDismiss = { sheet = null })
         SettingsSheet.LyricsSources -> TvLyricsSourcesDialog(onDismiss = { sheet = null })
+        SettingsSheet.SignatureApi -> TvSignatureApiDialog(onDismiss = { sheet = null })
         SettingsSheet.Update -> update?.let { TvUpdateDialog(update = it, onDismiss = { sheet = null }) }
         SettingsSheet.About -> TvAboutDialog(onDismiss = { sheet = null })
         null -> Unit

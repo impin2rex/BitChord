@@ -125,7 +125,6 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Album
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.ChevronLeft
@@ -158,7 +157,7 @@ import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material.icons.rounded.VolumeUp
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -180,7 +179,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
@@ -4609,7 +4608,7 @@ private fun DesktopTopBar(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        Icons.Rounded.VolumeUp,
+                        Icons.AutoMirrored.Rounded.VolumeUp,
                         DesktopStrings["d_volume", "Volume"],
                         tint = DesktopSecondary,
                         modifier = Modifier.size(17.dp),
@@ -5710,7 +5709,7 @@ private fun DesktopLocalMusicPage(
                 }
             }
             Spacer(Modifier.height(10.dp))
-            TabRow(selectedTabIndex = selectedTab, containerColor = Color.Transparent) {
+            PrimaryTabRow(selectedTabIndex = selectedTab, containerColor = Color.Transparent) {
                 listOf("Songs", "Artists", "Albums").forEachIndexed { index, label ->
                     Tab(selected = selectedTab == index, onClick = { selectedTab = index }, text = { Text(label) })
                 }
@@ -5720,7 +5719,7 @@ private fun DesktopLocalMusicPage(
                 DesktopEmptyPage(emptyIcon, emptyTitle, emptyDescription)
             } else if (drillDown != null) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { drillDown = null }) { Icon(Icons.Rounded.ArrowBack, DesktopStrings["back", "Back"]) }
+                    IconButton(onClick = { drillDown = null }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, DesktopStrings["back", "Back"]) }
                     Text(drillDown!!.first, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                 }
                 Spacer(Modifier.height(6.dp))

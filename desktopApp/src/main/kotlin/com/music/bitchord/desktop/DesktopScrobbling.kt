@@ -32,6 +32,9 @@ import kotlinx.coroutines.CancellationException
 import java.security.MessageDigest
 import kotlin.math.min
 
+/** One format for every Last.fm response: building a `Json` per use is slow. */
+private val LAST_FM_JSON = Json { ignoreUnknownKeys = true }
+
 /**
  * Scrobbling to Last.fm and ListenBrainz.
  *
@@ -44,7 +47,7 @@ object DesktopScrobbling {
     private const val LISTENBRAINZ_ENDPOINT = "https://api.listenbrainz.org/1/submit-listens"
 
     private val client = HttpClient(CIO) {
-        install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        install(ContentNegotiation) { json(LAST_FM_JSON) }
     }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var activeSongId: String? = null
@@ -107,7 +110,7 @@ object DesktopScrobbling {
             "username" to username,
         )
         val body = postLastFm(values)
-        val session = Json { ignoreUnknownKeys = true }
+        val session = LAST_FM_JSON
             .parseToJsonElement(body).jsonObject["session"]?.jsonObject
             ?: error("Last.fm did not return a session")
         val name = session["name"]?.jsonPrimitive?.contentOrNull ?: username
@@ -250,7 +253,7 @@ object DesktopScrobbling {
             // Last.fm answers a wrong password with a 403 and a message worth
             // showing, so the body is what the login dialog reports.
             runCatching {
-                Json { ignoreUnknownKeys = true }
+                LAST_FM_JSON
                     .parseToJsonElement(body).jsonObject["message"]?.jsonPrimitive?.contentOrNull
             }.getOrNull() ?: "Last.fm returned HTTP ${response.status.value}"
         }

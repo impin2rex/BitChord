@@ -473,7 +473,7 @@ object AppSettings {
      * lookup is skipped entirely — there is no hosted default.
      */
     val signatureApiEnabled = MutableStateFlow(false)
-    val signatureApiUrl = MutableStateFlow("")
+    val signatureApiUrl = MutableStateFlow(defaultSignatureApiUrl)
 
     /**
      * Blows the player's cover art out to a full-bleed banner running off the
@@ -898,6 +898,7 @@ object AppSettings {
         prioritizeSpotifyCanvas.value = prefs.getBoolean(KEY_PRIORITIZE_SPOTIFY_CANVAS, false)
         signatureApiEnabled.value = prefs.getBoolean(KEY_SIGNATURE_API_ENABLED, false)
         signatureApiUrl.value = normalizeSignatureApiUrl(prefs.getString(KEY_SIGNATURE_API_URL, "").orEmpty())
+            .ifBlank { defaultSignatureApiUrl }
         fullBleedArtwork.value = prefs.getBoolean(KEY_FULL_BLEED_ARTWORK, true)
         legacyMeshGradient.value = prefs.getBoolean(KEY_LEGACY_MESH_GRADIENT, false)
         lastPlayerScreen.value = runCatching {
@@ -1484,7 +1485,7 @@ object AppSettings {
     /** Normalizes (trim + strip trailing slash); blank forgets the provider. */
     fun setSignatureApiUrl(value: String) {
         val normalized = normalizeSignatureApiUrl(value)
-        signatureApiUrl.value = normalized
+        signatureApiUrl.value = normalized.ifBlank { defaultSignatureApiUrl }
         prefs.edit().putString(KEY_SIGNATURE_API_URL, normalized).apply()
     }
 
@@ -2009,6 +2010,12 @@ object AppSettings {
 
     private fun normalizePerformanceRefreshRate(value: Int): Int =
         value.takeIf { it in 50..240 } ?: DEFAULT_PERFORMANCE_REFRESH_RATE
+
+    /**
+     * The address this build shipped pointed at (`SIGNATURE_API_URL` in `local.properties`), which
+     * stands in until one is saved. Empty for a build that was given none.
+     */
+    val defaultSignatureApiUrl: String get() = normalizeSignatureApiUrl(BuildConfig.SIGNATURE_API_URL)
 
     fun normalizeSignatureApiUrl(raw: String): String =
         raw.trim().trimEnd('/').take(500)

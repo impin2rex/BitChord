@@ -16,7 +16,7 @@ class DesktopStringsTest {
             .forEach { language ->
                 val stream = DesktopStrings::class.java.getResourceAsStream("/strings/${language.tag}.xml")
                 assertTrue(stream != null, "no catalogue for ${language.tag}")
-                stream?.close()
+                stream.close()
             }
     }
 
@@ -51,7 +51,7 @@ class DesktopStringsTest {
     private fun keysIn(resource: String): Set<String> {
         val stream = DesktopStrings::class.java.getResourceAsStream(resource)
         assertTrue(stream != null, "no catalogue at $resource")
-        return stream!!.use { input ->
+        return stream.use { input ->
             Regex("""name="([^"]+)"""").findAll(input.readBytes().decodeToString())
                 .map { it.groupValues[1] }
                 .toSet()

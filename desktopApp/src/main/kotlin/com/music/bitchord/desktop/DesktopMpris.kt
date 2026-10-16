@@ -357,6 +357,7 @@ internal class DesktopMprisController(
 
         override fun OpenUri(uri: String) = Unit
 
+        @Suppress("UNCHECKED_CAST")
         override fun <A> Get(interfaceName: String, propertyName: String): A =
             controller.property(interfaceName, propertyName) as A
 

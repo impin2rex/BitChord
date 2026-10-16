@@ -53,6 +53,17 @@ val listenTogetherServer: String = (
     ).trim().trimEnd('/')
 
 /*
+ * Where the artist-signature API lives: only the address the Artist signatures
+ * setting starts with. Anything saved there wins, and empty is a supported
+ * state — the setting then asks for an address. See AppSettings.signatureApiUrl.
+ */
+val signatureApiUrl: String = (
+    localProps.getProperty("SIGNATURE_API_URL")
+        ?: System.getenv("SIGNATURE_API_URL")
+        ?: ""
+    ).trim().trimEnd('/')
+
+/*
  * Bump this by hand before cutting each sideloaded test build ("beta2",
  * "beta3", ...) and blank it out before cutting the real release. Marks the
  * versionName below as a pre-release: AppUpdateChecker.isNewer() treats any
@@ -94,6 +105,11 @@ android {
             "String",
             "LISTEN_TOGETHER_SERVER",
             "\"${listenTogetherServer.replace("\\", "\\\\").replace("\"", "\\\"")}\"",
+        )
+        buildConfigField(
+            "String",
+            "SIGNATURE_API_URL",
+            "\"${signatureApiUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"",
         )
         // The TV APKs share a GitHub release with the phone ones and are told
         // apart by name (BitChordTV-v1.8.apk, BitChordTV-v1.8_x86_64.apk), so

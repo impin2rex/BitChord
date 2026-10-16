@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LISTEN_TOGETHER_SERVER: ${{ secrets.LISTEN_TOGETHER_SERVER }}
+      SIGNATURE_API_URL: ${{ secrets.SIGNATURE_API_URL }}
 
     steps:
     - name: Checkout Repository

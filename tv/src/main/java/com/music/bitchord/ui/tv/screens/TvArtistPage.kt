@@ -46,7 +46,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.transformations
+import com.music.bitchord.R
+import com.music.bitchord.data.canvas.ArtistSignature
+import com.music.bitchord.data.canvas.SignatureInkTransformation
+import com.music.bitchord.ui.components.rememberArtistSignature
+import kotlin.math.roundToInt
 import com.music.bitchord.data.canvas.AppleArtistArt
 import com.music.bitchord.data.canvas.AppleArtistArtRepository
 import com.music.bitchord.data.model.BrowseType
@@ -117,6 +127,10 @@ internal fun TvArtistContent(
         }
     }
 
+    // Handwritten signature from the user's own artist-signature API, drawn only when Apple has no
+    // title logo, as on the phone.
+    val signature = rememberArtistSignature(title, ready = page != null && page.songs !is UiState.Loading)
+
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     TvChromeScrollEffect(listState)
@@ -135,6 +149,7 @@ internal fun TvArtistContent(
                         name = page?.title ?: title,
                         heroUrl = appleArt?.heroUrl ?: (page?.thumbnailUrl ?: artworkUrl).artworkAt(1280),
                         appleArt = appleArt,
+                        signature = signature,
                         stats = listOfNotNull(page?.monthlyListenerCount, page?.subscriberCountText).joinToString(" · "),
                         height = heroHeight,
                         canPlay = songs.isNotEmpty(),
@@ -259,6 +274,7 @@ private fun TvArtistHero(
     name: String,
     heroUrl: String?,
     appleArt: AppleArtistArt?,
+    signature: ArtistSignature?,
     stats: String,
     height: androidx.compose.ui.unit.Dp,
     canPlay: Boolean,
@@ -298,7 +314,8 @@ private fun TvArtistHero(
                 .padding(start = TvDimensions.SafeMarginHorizontal, end = TvDimensions.SafeMarginHorizontal, bottom = 8.dp),
         ) {
             val logo = appleArt?.logoUrl
-            var logoShown by remember(logo) { mutableStateOf(false) }
+            val sig = signature.takeIf { logo == null }
+            var logoShown by remember(logo, sig?.imageUrl) { mutableStateOf(false) }
             if (logo != null) {
                 val aspect = appleArt.logoAspect.coerceIn(0.4f, 6f)
                 AsyncImage(
@@ -311,6 +328,44 @@ private fun TvArtistHero(
                         .widthIn(max = 368.dp)
                         .aspectRatio(aspect),
                 )
+            } else if (sig != null) {
+                val isSvg = sig.format == "svg"
+                val aspect = sig.aspect.coerceIn(0.4f, 6f)
+                val context = LocalPlatformContext.current
+                // Vectors decode large so a small file stays crisp laid out big; a scan goes through
+                // the ink transformation (white paper to transparency, strokes to white) instead of
+                // being tinted, which would flatten it into a white blob.
+                val request = remember(sig.imageUrl) {
+                    ImageRequest.Builder(context).data(sig.imageUrl).apply {
+                        if (isSvg) {
+                            size(SIGNATURE_SVG_WIDTH, (SIGNATURE_SVG_WIDTH / aspect).roundToInt())
+                        } else {
+                            size(coil3.size.Size.ORIGINAL)
+                            transformations(SignatureInkTransformation)
+                        }
+                    }.build()
+                }
+                AsyncImage(
+                    model = request,
+                    contentDescription = name,
+                    contentScale = ContentScale.Fit,
+                    colorFilter = if (isSvg) ColorFilter.tint(Color.White) else null,
+                    onSuccess = { logoShown = true },
+                    // A signature reads best smaller than a title logo: 0.7 of one's size.
+                    modifier = Modifier
+                        .height(47.dp)
+                        .widthIn(max = 258.dp)
+                        .aspectRatio(aspect),
+                )
+                if (logoShown) {
+                    Text(
+                        text = stringResource(R.string.signed_by, name),
+                        style = TvType.Caption,
+                        color = Color.White.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
             if (!logoShown) {
                 Text(
@@ -441,3 +496,6 @@ private val ReleaseYear = Regex("""\b(19|20)\d{2}\b""")
 
 private fun ShelfItem.releaseYear(): Int? =
     ReleaseYear.findAll(subtitle).lastOrNull()?.value?.toIntOrNull()
+
+/** Vector signatures decode at this width so a small file stays crisp laid out large. */
+private const val SIGNATURE_SVG_WIDTH = 1600

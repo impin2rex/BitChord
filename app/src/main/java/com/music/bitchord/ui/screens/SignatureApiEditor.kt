@@ -85,7 +85,8 @@ fun SignatureApiEditor(hazeState: HazeState, onDismiss: () -> Unit) {
                 onDismiss()
             }
         },
-        onRemove = remove.takeIf { stored.isNotBlank() },
+        // The build's own default is not a saved address, so there is nothing to remove.
+        onRemove = remove.takeIf { stored.isNotBlank() && stored != AppSettings.defaultSignatureApiUrl },
         removeLabel = stringResource(R.string.remove),
         onDismiss = onDismiss,
     )

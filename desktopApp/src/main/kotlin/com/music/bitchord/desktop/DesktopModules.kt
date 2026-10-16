@@ -21,6 +21,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.HostAccess
+import org.graalvm.polyglot.io.IOAccess
 import org.graalvm.polyglot.proxy.ProxyExecutable
 import java.net.URI
 import java.net.http.HttpClient
@@ -149,7 +150,7 @@ private class DesktopModuleEngine(
     private val context = Context.newBuilder("js")
         .allowHostAccess(HostAccess.NONE)
         .allowHostClassLookup { false }
-        .allowIO(false)
+        .allowIO(IOAccess.NONE)
         .allowNativeAccess(false)
         .allowCreateThread(false)
         .build()

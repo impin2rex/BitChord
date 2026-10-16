@@ -53,6 +53,17 @@ val listenTogetherServer: String = (
         ?: "https://bitchord-listen-together.onrender.com"
     ).trim().trimEnd('/')
 
+/*
+ * Where the artist-signature API lives: only the address the Artist signatures
+ * setting starts with. Anything saved there wins, and empty is a supported
+ * state — the setting then asks for an address. See AppSettings.signatureApiUrl.
+ */
+val signatureApiUrl: String = (
+    localProps.getProperty("SIGNATURE_API_URL")
+        ?: System.getenv("SIGNATURE_API_URL")
+        ?: ""
+    ).trim().trimEnd('/')
+
 // See the root build.gradle.kts: one version for the phone and its watch app.
 val betaSuffix = rootProject.extra["bitchordBetaSuffix"] as String
 
@@ -80,6 +91,11 @@ android {
             "String",
             "LISTEN_TOGETHER_SERVER",
             "\"${listenTogetherServer.replace("\\", "\\\\").replace("\"", "\\\"")}\"",
+        )
+        buildConfigField(
+            "String",
+            "SIGNATURE_API_URL",
+            "\"${signatureApiUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"",
         )
         // Which release assets are this app's: the phone and TV APKs ship in
         // the same GitHub release, told apart by file name. See

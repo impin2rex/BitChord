@@ -88,8 +88,7 @@ internal enum class DesktopAudioQuality(
         fun stored(raw: String?, hasFourRungs: Boolean): DesktopAudioQuality {
             val value = raw?.trim()?.uppercase()?.takeIf { it.isNotBlank() } ?: return LOSSLESS
             val parsed = entries.firstOrNull { it.name == value }
-                ?: if (value == "STANDARD") MEDIUM else null
-                ?: return LOSSLESS
+                ?: if (value == "STANDARD") MEDIUM else return LOSSLESS
             return if (!hasFourRungs && parsed == HIGH) LOSSLESS else parsed
         }
     }

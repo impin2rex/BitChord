@@ -101,17 +101,22 @@ dependencies {
     implementation("dev.chrisbanes.haze:haze:$desktopHazeVersion")
     implementation("dev.chrisbanes.haze:haze-materials:$desktopHazeVersion")
 
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material3)
-    implementation(compose.components.resources)
-    implementation(compose.materialIconsExtended)
+    // The Compose plugin's own `compose.*` accessors are deprecated, so these are the coordinates
+    // they stood for. Keep [composeVersion] in step with the plugin version in the root build file;
+    // Material 3 and the icons ship on their own numbers.
+    val composeVersion = "1.10.3"
+    implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+    implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+    implementation("org.jetbrains.compose.material3:material3:1.9.0")
+    implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
+    // Pinned: this artifact no longer receives updates.
+    implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
     // The Skiko runtime rides in on this, and Skiko is per-platform.
     implementation(
         when (targetOs) {
-            "windows" -> compose.desktop.windows_x64
-            "macos" -> if (isArm64) compose.desktop.macos_arm64 else compose.desktop.macos_x64
-            else -> compose.desktop.linux_x64
+            "windows" -> "org.jetbrains.compose.desktop:desktop-jvm-windows-x64:$composeVersion"
+            "macos" -> "org.jetbrains.compose.desktop:desktop-jvm-macos-${if (isArm64) "arm64" else "x64"}:$composeVersion"
+            else -> "org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion"
         }
     )
 
