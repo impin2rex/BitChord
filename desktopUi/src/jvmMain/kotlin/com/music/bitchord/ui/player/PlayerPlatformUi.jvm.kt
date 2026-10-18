@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.graphics.skiaCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import java.util.Locale
 import kotlin.math.floor
 import kotlin.math.round
@@ -109,7 +109,11 @@ internal actual fun DrawScope.clipShiftedDown(
         }
         return
     }
-    val canvas = drawContext.canvas.skiaCanvas
+    // nativeCanvas, not skiaCanvas: the Windows build compiles this module
+    // against Compose 1.10.3, which has no skiaCanvas yet (see build.gradle.kts).
+    // 1.12 only deprecates nativeCanvas, and :sharedUi already uses it.
+    @Suppress("DEPRECATION")
+    val canvas = drawContext.canvas.nativeCanvas
     val paint = Paint().apply {
         imageFilter = ImageFilter.makeMatrixTransform(
             Matrix33.makeTranslate(0f, fraction),
