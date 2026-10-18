@@ -69,6 +69,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Velocity
@@ -122,12 +123,16 @@ internal fun keepScrollInList(listState: LazyListState) = object : NestedScrollC
  */
 private val QUEUE_ROW_MOTION = tween<IntOffset>(durationMillis = 200, easing = FastOutSlowInEasing)
 
-/** Softens the list where it meets the header and the scrubber. */
-internal fun Modifier.fadingEdges(): Modifier = this
+/**
+ * Softens the list where it meets the header and the scrubber. [bottom] is
+ * longer for the lyric sheet: its rows are tall enough that 28dp reads as a cut.
+ */
+internal fun Modifier.fadingEdges(bottom: Dp = 28.dp): Modifier = this
     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
     .drawWithContent {
         drawContent()
         val fade = 28.dp.toPx()
+        val bottomFade = bottom.toPx()
         drawRect(
             brush = Brush.verticalGradient(
                 colors = listOf(Color.Transparent, Color.Black),
@@ -139,7 +144,7 @@ internal fun Modifier.fadingEdges(): Modifier = this
         drawRect(
             brush = Brush.verticalGradient(
                 colors = listOf(Color.Black, Color.Transparent),
-                startY = size.height - fade,
+                startY = size.height - bottomFade,
                 endY = size.height,
             ),
             blendMode = BlendMode.DstIn,

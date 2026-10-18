@@ -349,17 +349,14 @@ private val GAP_ROW_SPACING = 16.dp
  * full brightness for two or three lines and only fading past that. It still
  * settles to a floor rather than nothing, so a little read-ahead stays legible.
  */
-private val LINE_FALLOFF_ALPHA = floatArrayOf(1f, 0.42f, 0.28f, 0.2f, 0.16f)
+private val LINE_FALLOFF_ALPHA = floatArrayOf(1f, 0.5f, 0.4f, 0.34f, 0.3f)
 
 /**
- * How the lines already sung fall away above the playing one.
- *
- * Unlike the read-ahead falloff above, this one runs straight to nothing: a line
- * is fully gone the moment it is no longer the one being sung, rather than
- * lingering as a half-lit ghost. The lines ahead keep their gentler ramp, so
- * what is coming stays legible.
+ * How the lines already sung fall away above the playing one: a little steeper
+ * than the read-ahead ramp, but faded rather than dropped, so the panel above
+ * the sung line doesn't go blank.
  */
-private val LINE_SUNG_ALPHA = floatArrayOf(1f, 0f)
+private val LINE_SUNG_ALPHA = floatArrayOf(1f, 0.4f, 0.3f, 0.24f, 0.2f)
 
 /**
  * How far a line defocuses per row of distance from the one being sung, and the
@@ -371,7 +368,9 @@ private val LINE_SUNG_ALPHA = floatArrayOf(1f, 0f)
  * whether the reader is on a 1x or a 2x panel.
  */
 private const val LYRIC_BLUR_PX_PER_LINE = 3f
-private const val LYRIC_BLUR_MAX_PX = 22f
+// Capped low enough that a far row still reads as words: at 22px the stack
+// past the fourth line blurred away entirely and looked cut off.
+private const val LYRIC_BLUR_MAX_PX = 8f
 
 /** The window each row eases its blur and brightness across when focus moves. */
 private const val LYRIC_BLUR_MS = 300
@@ -2053,7 +2052,7 @@ internal fun LyricsPanel(
             // below takes taps at the initial pass, so while a pick is open it
             // would swallow every choice before the row ever saw it.
             .revealLyricsControlsOnTap(!controlsOpen && !picking, onBottomHalfTap)
-            .fadingEdges(),
+            .fadingEdges(bottom = maxHeight / 8),
         // Each row carries GLOW_ROOM of its own inset for the halo, so the
         // list hands that much back — otherwise the lines would sit a glow's
         // width further apart and further in than they used to.
