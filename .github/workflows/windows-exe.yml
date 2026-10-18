@@ -55,8 +55,10 @@ jobs:
     - name: Tests
       run: .\gradlew.bat :shared:jvmTest :desktopApp:test "-Pbitchord.version=${{ steps.version.outputs.value }}"
 
+    # createDistributable alongside, as in release.yml: packageExe alone leaves
+    # no app image at binaries/main/app, which the check below reads the jar from.
     - name: Build EXE
-      run: .\gradlew.bat :desktopApp:packageExe "-Pbitchord.version=${{ steps.version.outputs.value }}"
+      run: .\gradlew.bat :desktopApp:packageExe :desktopApp:createDistributable "-Pbitchord.version=${{ steps.version.outputs.value }}"
 
     # A build that silently drops a native piece still produces an .exe; this
     # is what says the Automix analyser and media controls made it in.
