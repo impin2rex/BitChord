@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
@@ -127,16 +126,6 @@ private val LandscapeArtShape = RoundedCornerShape(LANDSCAPE_ART_CORNER)
 private val LANDSCAPE_HANDLE_STRIP = 24.dp
 
 /**
- * How much of the desktop left column the transport and the toggle row take.
- *
- * The sleeve is sized to leave this much under it, so the controls sit close
- * beneath the cover instead of the sleeve being centred in the whole column and
- * shunting them down to its foot. Only the desktop window uses it; a
- * phone-height window keeps the sleeve filling the column above its row.
- */
-private val LANDSCAPE_DESKTOP_CONTROLS_RESERVE = 300.dp
-
-/**
  * The player in a landscape window — a tablet, or a phone on its side. See
  * [landscapePlayerAvailable].
  *
@@ -192,13 +181,6 @@ internal fun LandscapePlayerLayout(
             val compact = maxHeight < LANDSCAPE_COMPACT_HEIGHT
             val gutter = if (compact) LANDSCAPE_GUTTER_COMPACT else PLAYER_GUTTER
 
-            // On a desktop window the transport sits under the sleeve in the
-            // left column, so the main state shows the lyric sheet here rather
-            // than the controls — words fill this space, as in Apple Music. The
-            // queue still toggles over it. A phone-height window is untouched:
-            // its main pane is the transport, exactly as before.
-            val shown = if (!compact && pane == PlayerPane.Main) PlayerPane.Lyrics else pane
-
             Row(
                 modifier = Modifier
                     .widthIn(max = LANDSCAPE_PLAYER_MAX_WIDTH)
@@ -214,55 +196,26 @@ internal fun LandscapePlayerLayout(
                         .fillMaxHeight()
                         .padding(horizontal = gutter),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = if (compact) Arrangement.Top else Arrangement.Center,
                 ) {
-                    if (compact) {
-                        // The sleeve is square and takes whichever of the two
-                        // axes runs out first once the row below has had its
-                        // height — the column's width on a big tablet, the
-                        // height on anything shorter. Measured here rather than
-                        // estimated, so the row under it can never be pushed off
-                        // the bottom.
-                        BoxWithConstraints(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            artwork(Modifier.size(minOf(maxWidth, maxHeight)), false)
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        actions()
-                    } else {
-                        // On a desktop window the transport lives here, right
-                        // under the sleeve and always on screen, the way Apple
-                        // Music lays the fullscreen player out. The sleeve is
-                        // capped to [LANDSCAPE_DESKTOP_CONTROLS_RESERVE] less
-                        // than the column so there is room under it, and the box
-                        // wraps that square exactly — no slack left below the
-                        // cover to shove the controls back down to the foot.
-                        BoxWithConstraints(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            artwork(
-                                Modifier.size(
-                                    minOf(maxWidth, maxHeight - LANDSCAPE_DESKTOP_CONTROLS_RESERVE),
-                                ),
-                                true,
-                            )
-                        }
-                        Spacer(Modifier.height(24.dp))
-                        controls(false)
-                        // The volume bar and the lyrics/output/queue row are
-                        // folded into the player's overflow, which the song
-                        // menu's "More…" opens — so the sleeve and the
-                        // transport are all this column shows.
+                    // The sleeve is square and takes whichever of the two axes
+                    // runs out first once the row below has had its height —
+                    // the column's width on a big tablet, the height on
+                    // anything shorter. Measured here rather than estimated,
+                    // so the row under it can never be pushed off the bottom.
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        artwork(Modifier.size(minOf(maxWidth, maxHeight)), !compact)
                     }
+                    Spacer(Modifier.height(if (compact) 12.dp else 24.dp))
+                    actions()
                 }
 
                 AnimatedContent(
-                    targetState = shown,
+                    targetState = pane,
                     transitionSpec = {
                         fadeIn(
                             tween(

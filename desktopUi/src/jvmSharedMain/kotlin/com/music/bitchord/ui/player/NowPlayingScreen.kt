@@ -2038,9 +2038,7 @@ fun NowPlayingScreen(
                     controls = { compact ->
                         LandscapeMainPane(
                             compact = compact,
-                            // The "Playing from …" caption is gone, matching the portrait player:
-                            // the credits name the track, and the queue says where it came from.
-                            caption = null,
+                            caption = if (hideSongStatus) null else playbackOriginText(song, playedBy),
                             onOpenCaption = openPlaybackOrigin,
                             credits = {
                                 LandscapeCredits(
@@ -2055,13 +2053,7 @@ fun NowPlayingScreen(
                                     onMenuAnchor = playerMenuAnchor?.let { anchor -> { anchor.value = it } },
                                 )
                             },
-                            // On a phone-height window the transport is the right
-                            // column's main pane, and the one-line lyric sits over
-                            // its scrubber as it always has. On a desktop window
-                            // the transport lives under the sleeve and the full
-                            // lyric sheet owns the column on the right, so there is
-                            // no room — or need — for a single line here.
-                            lyricStrip = if (compact && syncedLyricsEnabled) {
+                            lyricStrip = if (syncedLyricsEnabled) {
                                 {
                                     CurrentLyricStrip(
                                         lines = lyricsTranslation.displayedLyrics,
@@ -2114,7 +2106,7 @@ fun NowPlayingScreen(
                                     compact = compact,
                                 )
                             },
-                            volume = if (hideVolumeBar || !compact) {
+                            volume = if (hideVolumeBar) {
                                 null
                             } else {
                                 {
@@ -2137,12 +2129,6 @@ fun NowPlayingScreen(
                             },
                             status = lyricsTranslation.status,
                             onStatusClick = { showLyricsProviders = true },
-                            // On a desktop window the sheet's footer is folded into
-                            // the song menu and the overflow; a phone-height window
-                            // keeps it. Where the sung line rests is the panel's own
-                            // anchor (see [LyricsPanel]), so the sheet runs the full
-                            // height of the column.
-                            showBar = compact,
                             picking = lyricPicker.picking,
                             pickBar = {
                                 LyricsPickBar(
