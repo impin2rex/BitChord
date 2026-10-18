@@ -1217,7 +1217,7 @@ class SourcesTest {
         val quick = FakeSource("JioSaavn", answerAfterMs = 5, format = StreamFormat("mp4", kbps = 320))
         val elapsed = measureTimeMillis {
             val (source, stream) = SourceResolver.bestAcross(
-                listOf(slow, quick), raceTarget(), StreamRequest.Lossless,
+                listOf(slow, quick), raceTarget(), StreamRequest.Best,
             )!!
             assertEquals("JioSaavn", source.displayName)
             assertEquals(320, stream.format.kbps)
@@ -1238,8 +1238,29 @@ class SourcesTest {
     fun `abandons the sources still running once it has an answer`() = runBlocking {
         val slow = FakeSource("Ricky's Addon", answerAfterMs = 2_000, format = StreamFormat("flac"))
         val quick = FakeSource("JioSaavn", answerAfterMs = 5, format = StreamFormat("mp4", kbps = 320))
-        SourceResolver.bestAcross(listOf(slow, quick), raceTarget(), StreamRequest.Lossless)
+        SourceResolver.bestAcross(listOf(slow, quick), raceTarget(), StreamRequest.Best)
         assertTrue("the slow source was left running", slow.cancelled)
+    }
+
+    /**
+     * With lossless asked for, a quick lossy settle-for (JioSaavn's 320) starts
+     * the track at once, but must not cancel a FLAC source a moment behind it:
+     * that search carries on and its answer arrives through `late`.
+     */
+    @Test
+    fun `hands the lossless search on when a lossy answer starts the track`() = runBlocking {
+        val slow = FakeSource("Ricky's Addon", answerAfterMs = 300, format = StreamFormat("flac"))
+        val quick = FakeSource("JioSaavn", answerAfterMs = 5, format = StreamFormat("mp4", kbps = 320))
+        val late = kotlinx.coroutines.CompletableDeferred<SourceStream?>()
+        val elapsed = measureTimeMillis {
+            val (source, _) = SourceResolver.bestAcross(
+                listOf(slow, quick), raceTarget(), StreamRequest.Lossless, late = late,
+            )!!
+            assertEquals("JioSaavn", source.displayName)
+        }
+        assertTrue("took ${elapsed}ms, so it waited for the slow source", elapsed < 250)
+        assertEquals(true, late.await()?.format?.isLossless)
+        assertFalse(slow.cancelled)
     }
 
     /**

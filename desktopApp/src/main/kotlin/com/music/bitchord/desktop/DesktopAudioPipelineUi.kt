@@ -44,7 +44,7 @@ internal fun DesktopAudioPipelineDialog(
             val source = pipeline.sourceFormat ?: format
             PipelineStage(DesktopStrings["pipeline_source", "Source"]) {
                 PipelineRow(DesktopStrings["pipeline_format", "Format"], source?.codecLabel)
-                PipelineRow(DesktopStrings["pipeline_bitrate", "Bitrate"], source?.kbps?.let { "$it kbps" })
+                PipelineRow(DesktopStrings["pipeline_bitrate", "Bitrate"], source?.kbpsOrPcm?.let { "$it kbps" })
                 PipelineRow(
                     DesktopStrings["pipeline_sample_rate", "Sample rate"],
                     source?.sampleRateHz?.let { "${it / 1000.0} kHz" },

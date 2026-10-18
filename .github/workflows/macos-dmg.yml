@@ -31,7 +31,7 @@ jobs:
     - name: Work out the version
       id: version
       run: |
-        version=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
+        version=$(sed -n 's/.*extra\["bitchordVersionName"\] = "\(.*\)".*/\1/p' build.gradle.kts | head -1)
         echo "value=$version" >> "$GITHUB_OUTPUT"
         echo "Building $version"
 

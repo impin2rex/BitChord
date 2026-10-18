@@ -315,7 +315,24 @@ internal object DesktopSourceRegistry {
             DesktopModuleSource.parseTrack(song.videoId) != null ||
             song.videoId.startsWith("jiosaavn:")
         if (owned) {
-            return@runCatching DesktopLiveResolution(resolve(song, quality, excludedSourceId).getOrThrow())
+            val stream = resolve(song, quality, excludedSourceId).getOrThrow()
+            // A row a source owns (JioSaavn, a module) starts on that source at once, and the
+            // sources ranked above it look for a better copy behind it — as on Android, where this
+            // used to be asked *before* the first note and held the track back for every search.
+            // An addon's own row is played as picked, never substituted.
+            val upgrade = if (DesktopAddonSource.parseTrack(song.videoId) == null && !song.isVideo) {
+                betterThan(
+                    stream,
+                    available.filter {
+                        it.config.kind != DesktopSourceKind.YOUTUBE && it.config.id != excludedSourceId
+                    },
+                    song,
+                    quality,
+                )
+            } else {
+                null
+            }
+            return@runCatching DesktopLiveResolution(stream, upgrade)
         }
 
         val youtube = available.firstOrNull {
@@ -390,7 +407,7 @@ internal object DesktopSourceRegistry {
         song: Song,
         quality: String?,
     ): Deferred<DesktopStream?>? {
-        if (playing.format.isLossless) return null
+        if (playing.format.isLossless || playing.format.isDolbyAtmos) return null
         val winnerRank = configs().firstOrNull { it.id == playing.sourceId }?.kind?.rank
             ?: DesktopSourceKind.YOUTUBE.rank
         val better = candidates.filter { it.config.kind.rank < winnerRank }
@@ -401,7 +418,13 @@ internal object DesktopSourceRegistry {
         )
         // The registry's own scope, like both legs of the race above: this outlives the call that
         // started it by design.
-        return scope.async { withTimeoutOrNull(UPGRADE_TIMEOUT_MS) { firstSubstitute(better, song, quality) } }
+        // Only an answer worth the swap ends the search. Taking the first usable one let a module's
+        // MP3 settle-for beat a slower FLAC, which then waited for a follow-up search.
+        return scope.async {
+            withTimeoutOrNull(UPGRADE_TIMEOUT_MS) {
+                firstSubstitute(better, song, quality) { worthSwapping(it.format, playing.format) }
+            }
+        }
     }
 
     /** The first usable stream from any of [sources], each asked in parallel. */
@@ -409,6 +432,7 @@ internal object DesktopSourceRegistry {
         sources: List<SourceAdapter>,
         song: Song,
         quality: String?,
+        accept: (DesktopStream) -> Boolean = { true },
     ): DesktopStream? = coroutineScope {
         val running = sources
             .map { source ->
@@ -421,7 +445,7 @@ internal object DesktopSourceRegistry {
                     running.forEach { candidate -> candidate.onAwait { candidate } }
                 }
                 running -= done
-                done.await()?.let { return@coroutineScope it }
+                done.await()?.takeIf(accept)?.let { return@coroutineScope it }
             }
             null
         } finally {
@@ -461,7 +485,9 @@ internal object DesktopSourceRegistry {
             "asking ${better.joinToString { it.descriptor.name }} again for a better copy of " +
                 "'${song.title}'",
         )
-        return withTimeoutOrNull(UPGRADE_TIMEOUT_MS) { firstSubstitute(better, song, quality) }
+        return withTimeoutOrNull(UPGRADE_TIMEOUT_MS) {
+            firstSubstitute(better, song, quality) { worthSwapping(it.format, playing?.format) }
+        }
     }
 
     /** Whether a stream a source handed back can actually be played here. */

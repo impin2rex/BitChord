@@ -555,19 +555,20 @@ class DesktopPlaybackEngine(
     /**
      * Resolves [song] (or takes its file) and opens it as the incoming track, off the audio thread.
      *
-     * [race] is for a track armed shortly before its transition: the sources ranked above YouTube
-     * are raced against it, as when a track is started by hand, so the blend never waits on a slow
-     * addon — an addon routinely takes 10-15s to answer, which outlasted the arming lead and left
-     * the marker on the scrubber with no transition behind it. Whatever the race was still waiting
-     * on is swapped in when it answers; see [upgradeIncoming].
+     * The sources ranked above YouTube are raced against it, as when a track is started by hand,
+     * so the blend never waits on a slow addon — an addon routinely takes 10-15s to answer, which
+     * outlasted the arming lead and left the marker on the scrubber with no transition behind it.
+     * Whatever the race was still waiting on is swapped in when it answers; see [upgradeIncoming].
      */
-    private fun resolveUpcoming(song: Song, local: DesktopStream? = null, race: Boolean = false) {
+    private fun resolveUpcoming(song: Song, local: DesktopStream? = null) {
         nextResolveJob = scope.launch {
             val askedAt = System.nanoTime()
             val resolved: Result<DesktopLiveResolution> = when {
                 local != null -> Result.success(DesktopLiveResolution(local))
-                race -> DesktopMusicSources.resolveLive(song, audioQuality)
-                else -> DesktopMusicSources.resolve(song, audioQuality).map { DesktopLiveResolution(it) }
+                // Raced whether armed late or read ahead: the deck is ready on the first copy to
+                // answer, and a better one replaces it through [upgradeIncoming] before it is
+                // heard — so Automix blends into the FLAC without the deck waiting on a slow source.
+                else -> DesktopMusicSources.resolveLive(song, audioQuality)
             }
             resolved.fold(
                 onSuccess = { live ->
@@ -1798,7 +1799,7 @@ class DesktopPlaybackEngine(
             "arming '${song.title}' ${"%.1f".format((startMs - positionMs).coerceAtLeast(0) / 1_000.0)}s " +
                 "before its transition",
         )
-        resolveUpcoming(song, race = true)
+        resolveUpcoming(song)
     }
 
     /** What the shared planner makes of this pair. */

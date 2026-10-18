@@ -966,10 +966,23 @@ object AudioCache {
                 // leaves nothing pinned, and this falls through to the same
                 // URL-only warm-up it did before — YouTube resolves the track at
                 // playback time as usual.
-                val warmed = if (substitutable && target != null && !pinnedToYouTube) {
-                    runCatching { SourceResolver.prefetchSubstitute(target) }
+                // The first pin stands. This runs again on every queue change,
+                // and the patient lookup takes whichever lossless source answers
+                // first — so a re-run could re-pin Unified over Qobuz after bytes
+                // were already cached under the first pin, leaving a file that
+                // starts as one server's copy and continues as another's.
+                val existing = StreamChoice.of(next)
+                val warmed = if (existing != null) {
+                    existing.takeIf { StreamChoice.isSubstitute(next) }
+                } else if (substitutable && target != null && !pinnedToYouTube) {
+                    runCatching { SourceResolver.prefetchSubstitute(target, patient = true) }
                         .onFailure { TrackLog.d(TAG, "warm-up substitute failed for $next: ${it.message}", about = next) }
                         .getOrNull()
+                        // Never a manifest: read-ahead fetches bytes through a
+                        // progressive source, which caches the DASH XML as if it
+                        // were audio — and the track then fails at 0ms on it.
+                        // Left unpinned, playback's own race handles manifests.
+                        ?.takeUnless { StreamContainer.isManifest(it.url) }
                         ?.also { StreamChoice.remember(next, it, substituted = true) }
                 } else {
                     null

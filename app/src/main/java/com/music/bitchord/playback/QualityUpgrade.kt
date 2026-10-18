@@ -87,6 +87,14 @@ object QualityUpgrade {
          * twice for a rejection it already gave the first time.
          */
         val servedBy: String? = null,
+        /**
+         * The lossless sources the live race left searching when a lossy
+         * answer started the track — see [SourceResolver.bestAcross]'s `late`.
+         * Becomes the follow-up's [inFlight] once a lossy upgrade swaps in, so
+         * the FLAC is swapped to the moment it lands rather than searched for
+         * again from scratch.
+         */
+        val lossless: Deferred<SourceStream?>? = null,
     )
 
     private val pending = ConcurrentHashMap<String, Pending>()
@@ -199,6 +207,7 @@ object QualityUpgrade {
         inFlight: Deferred<SourceStream?>? = null,
         playing: StreamFormat? = null,
         servedBy: String? = null,
+        lossless: Deferred<SourceStream?>? = null,
     ): Boolean {
         // Not gated on the request being lossless. A source ranked above
         // YouTube can be worth swapping to on bitrate alone — see
@@ -211,9 +220,10 @@ object QualityUpgrade {
             !SourceResolver.canSubstituteForYouTube()
         ) {
             inFlight?.cancel()
+            lossless?.cancel()
             return false
         }
-        pending[mediaId] = Pending(target, inFlight, playing, servedBy)
+        pending[mediaId] = Pending(target, inFlight, playing, servedBy, lossless)
         NerdStats.onLosslessRaceStart(mediaId)
         TrackLog.d(
             TAG,
@@ -277,7 +287,11 @@ object QualityUpgrade {
      * entry and the settings; nothing here touches the network.
      */
     fun couldStillUpgrade(mediaId: String, uri: Uri?): Boolean {
-        if (uri == null || uri.getQueryParameter("v") == null ||
+        // A source row reverted to YouTube is playing YouTube's audio like any
+        // YouTube row, and is worth the same second look once asked for.
+        val revertedSource = uri?.authority == "source" &&
+            uri.getQueryParameter(DIRECT_YOUTUBE_PARAMETER) == "1"
+        if (uri == null || (uri.getQueryParameter("v") == null && !revertedSource) ||
             uri.getQueryParameter("m") == "1"
         ) return false
         // Already upgraded: this *is* the better copy. Except when the listener
@@ -358,7 +372,11 @@ object QualityUpgrade {
         // entry here at all: [pending] keeps [couldStillUpgrade] off it for
         // exactly as long as the question is genuinely open, and marking it
         // answered before it has been asked is what made a skip permanent.
-        if (NerdStats.isLosslessMime(playingMime)) {
+        // Not for an upgrade asked for by hand: that is only offered over
+        // YouTube's own audio, and the format on record can still be the FLAC
+        // from before a revert — same media id — which filed the track as
+        // "already lossless" and ended the search before it started.
+        if (mediaId !in handAsked && NerdStats.isLosslessMime(playingMime)) {
             asked += mediaId
             // The codec is named because this line is a dead end — the track is
             // in [asked] by now and will never be offered an upgrade again — and
@@ -472,7 +490,8 @@ object QualityUpgrade {
                     if (needsLosslessFollowUp(late.format)) {
                         followUps[mediaId] = waiting.copy(
                             target = waiting.target.copy(durationSec = effectiveDurationSec),
-                            inFlight = null,
+                            inFlight = waiting.lossless,
+                            lossless = null,
                             playing = late.format,
                             servedBy = late.sourceConfigId,
                         )
@@ -489,12 +508,20 @@ object QualityUpgrade {
                 waiting.target.copy(durationSec = effectiveDurationSec),
                 playing = waiting.playing,
                 servedBy = waiting.servedBy,
+                // Asked for by hand, the match is the one that picked the copy
+                // in the first place rather than the two-second one. A track
+                // reverted to YouTube is measured at YouTube's upload length,
+                // which for a video's audio can sit several seconds off every
+                // catalogue copy — so the strict match found nothing, ever,
+                // and a song only JioSaavn holds could never come back to it.
+                byHand = mediaId in handAsked,
             ).also {
                 found = it
                 if (it != null && needsLosslessFollowUp(it.format)) {
                     followUps[mediaId] = waiting.copy(
                         target = waiting.target.copy(durationSec = effectiveDurationSec),
-                        inFlight = null,
+                        inFlight = waiting.lossless,
+                        lossless = null,
                         playing = it.format,
                         servedBy = it.sourceConfigId,
                     )
@@ -510,6 +537,8 @@ object QualityUpgrade {
                 // progress sample.
                 pending.remove(mediaId)
                 asked += mediaId
+                // Not handed on to a follow-up, so nothing will ever read it.
+                if (followUps[mediaId]?.inFlight !== waiting.lossless) waiting.lossless?.cancel()
             }
             // Otherwise the search was cancelled — the queue moved on while it
             // was still running — and *nothing was learned*. The track is left
@@ -606,6 +635,11 @@ object QualityUpgrade {
      *    a substitution nothing announced, which is the case it was written for.
      */
     fun isKnownToBePlayingYouTubesOwn(mediaId: String, rendition: String?): Boolean {
+        // A reverted item is YouTube's own by construction. Read as "some
+        // other rendition", it offered "Revert to original" over the very
+        // Opus it had reverted to — after an upgrade that found nothing,
+        // the menu said the opposite of where the track was.
+        if (rendition == ORIGINAL) return true
         if (rendition != null) return false
         return StreamChoice.of(mediaId) != null && !StreamChoice.isSubstitute(mediaId)
     }
@@ -625,7 +659,7 @@ object QualityUpgrade {
 
     /** Abandons the second look for [mediaId] — the queue has moved on. */
     fun forget(mediaId: String) {
-        pending.remove(mediaId)?.inFlight?.cancel()
+        pending.remove(mediaId)?.let { it.inFlight?.cancel(); it.lossless?.cancel() }
         followUps.remove(mediaId)?.inFlight?.cancel()
         forced.remove(mediaId)
         shelved.remove(mediaId)
@@ -671,6 +705,8 @@ object QualityUpgrade {
      * the answer being waited for, not a stale one, and the item it was started
      * against is the item still playing.
      */
+    fun isAskedByHand(mediaId: String): Boolean = mediaId in handAsked
+
     fun askByHand(mediaId: String) {
         handAsked += mediaId
         asked -= mediaId
@@ -754,7 +790,9 @@ object QualityUpgrade {
      */
     fun forcedStream(uri: Uri): SourceStream? {
         if (uri.getQueryParameter(MARKER)?.startsWith(UPGRADED) != true) return null
-        return uri.getQueryParameter("v")?.let(forced::get)
+        // A source-backed row has no `v` — it is keyed by its track key, the
+        // same media id [force] was given. See [mediaIdIn].
+        return mediaIdIn(uri)?.let(forced::get)
     }
 
     /** The same URI, marked so Media3 rebuilds it and each upgrade gets its own cache entry. */

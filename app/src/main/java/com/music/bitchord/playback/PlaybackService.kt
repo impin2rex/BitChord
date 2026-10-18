@@ -241,6 +241,12 @@ internal class ManualUpgradeThrottle(private val cooldownMs: Long) {
         lastAcceptedAtMs = nowMs
         return 0L
     }
+
+    /** A revert is a new starting point; the next ask is not a repeat. */
+    @Synchronized
+    fun reset() {
+        lastAcceptedAtMs = null
+    }
 }
 
 
@@ -1370,15 +1376,87 @@ class PlaybackService : MediaLibraryService() {
             if (dataSpec.uri.authority == "source") {
                 val directYouTube =
                     dataSpec.uri.getQueryParameter(DIRECT_YOUTUBE_PARAMETER) == "1"
-                val stream = runBlocking(about) {
-                    withTimeout(RESOLVE_TIMEOUT_MS) {
-                        if (directYouTube) {
-                            SourceResolver.youtubeFallback(SourceResolver.targetIn(dataSpec.uri))
-                        } else {
-                            SourceResolver.resolve(dataSpec.uri)
+                val sourceMediaId = mediaIdIn(dataSpec.uri)
+                // A swapped-in upgrade, exactly as for a YouTube row below:
+                // this URL is what the player agreed to when it took the swap,
+                // and every re-open has to arrive at the same bytes.
+                if (!directYouTube) {
+                    QualityUpgrade.forcedStream(dataSpec.uri)?.let { upgraded ->
+                        if (sourceMediaId != null && !QualityUpgrade.isAuditioning(sourceMediaId)) {
+                            val name = upgraded.sourceConfigId?.let { SourceRegistry.config(it)?.displayName }
+                                ?: "Upgrade"
+                            NerdStats.onSourceStream(sourceMediaId, upgraded.format, name)
+                            NerdStats.recordSource(sourceMediaId, name)
+                        }
+                        TrackLog.d(
+                            "BitChord",
+                            "serving upgraded $sourceMediaId at ${dataSpec.position} (${upgraded.format.summary})",
+                            about = sourceMediaId,
+                        )
+                        return@Resolver dataSpec.buildUpon()
+                            .setUri(Uri.parse(upgraded.url))
+                            .setHttpRequestHeaders(upgraded.headers)
+                            .build()
+                    }
+                }
+                // Lossless sources ranked above this row's own are searched in
+                // the background while it starts — see [SourceResolver.resolve].
+                // Only once per track: this runs again on every re-open, and a
+                // track already waiting on (or done with) its second look has
+                // nothing to gain from another search.
+                val late = if (!directYouTube && sourceMediaId != null &&
+                    !QualityUpgrade.isPending(sourceMediaId) &&
+                    !QualityUpgrade.hasAnsweredFor(sourceMediaId)
+                ) {
+                    CompletableDeferred<SourceStream?>()
+                } else {
+                    null
+                }
+                val resolved = try {
+                    runBlocking(about) {
+                        withTimeout(RESOLVE_TIMEOUT_MS) {
+                            if (directYouTube) {
+                                SourceResolver.youtubeFallback(
+                                    SourceResolver.targetIn(dataSpec.uri),
+                                    knownId = YouTubeOriginals.of(sourceMediaId),
+                                ).also { YouTubeOriginals.remember(sourceMediaId, it?.matchedId) }
+                            } else {
+                                SourceResolver.resolve(dataSpec.uri, late)
+                            }
                         }
                     }
-                } ?: throw java.io.IOException(
+                } catch (e: Throwable) {
+                    late?.cancel()
+                    throw e
+                }
+                // Learn this row's YouTube upload while it plays, so a revert
+                // goes straight to it — see [YouTubeOriginals].
+                if (!directYouTube && resolved != null && sourceMediaId != null &&
+                    YouTubeOriginals.startLookup(sourceMediaId)
+                ) {
+                    val target = SourceResolver.targetIn(dataSpec.uri)
+                    scope.launch(Dispatchers.IO + TrackLog.about(sourceMediaId)) {
+                        var found: String? = null
+                        try {
+                            found = SourceResolver.youtubeIdFor(target)
+                            YouTubeOriginals.remember(sourceMediaId, found)
+                        } finally {
+                            YouTubeOriginals.endLookup(sourceMediaId, found != null)
+                        }
+                    }
+                }
+                if (late != null && sourceMediaId != null) {
+                    val lossy = resolved?.takeIf { !it.format.isDolbyAtmos && it.format.isLossless != true }
+                    val handed = lossy != null && QualityUpgrade.settledForLess(
+                        mediaId = sourceMediaId,
+                        target = SourceResolver.targetIn(dataSpec.uri),
+                        inFlight = late,
+                        playing = lossy.format,
+                        servedBy = lossy.sourceConfigId,
+                    )
+                    if (!handed) late.cancel()
+                }
+                val stream = resolved ?: throw java.io.IOException(
                     if (directYouTube) {
                         "No YouTube audio fallback matched ${dataSpec.uri.getQueryParameter("n")}"
                     } else {
@@ -1415,7 +1493,13 @@ class PlaybackService : MediaLibraryService() {
             // Answer it before StreamChoice, the module race and a pending
             // upgrade can put another source back under the listener.
             if (dataSpec.uri.getQueryParameter(DIRECT_YOUTUBE_PARAMETER) == "1") {
-                QualityUpgrade.forget(videoId)
+                // Only while the listener is still holding the original. An
+                // upgrade asked for by hand unpins the track but leaves this
+                // item playing under the search — see [upgradeQualityNow] —
+                // and any re-open of it (a seek, a fetch past the cached bytes)
+                // used to wipe that search and the stream it found, so the
+                // swap silently never came.
+                if (OriginalVersion.isPinned(videoId)) QualityUpgrade.forget(videoId)
                 StreamChoice.forget(videoId)
                 NerdStats.clearDeclared(videoId)
                 NerdStats.recordSource(videoId, "YouTube")
@@ -1919,7 +2003,7 @@ class PlaybackService : MediaLibraryService() {
             }
         val revert = current
             ?.takeIf {
-                it.hasYouTubeOriginal() &&
+                it.canRevertToOriginal() &&
                     it.localUri == null &&
                     !OriginalVersion.isPinned(it.videoId)
             }
@@ -2428,19 +2512,31 @@ class PlaybackService : MediaLibraryService() {
         val activePlayer = player ?: return
         val index = activePlayer.currentMediaItemIndex
         if (index !in 0 until activePlayer.mediaItemCount) return
-        val song = activePlayer.currentMediaItem?.toSong() ?: return
-        if (!song.hasYouTubeOriginal() ||
+        val item = activePlayer.currentMediaItem ?: return
+        val song = item.toSong()
+        if (!song.canRevertToOriginal() ||
             song.localUri != null ||
             OriginalVersion.isPinned(song.videoId)
         ) {
             return
         }
+        // A JioSaavn or addon row has no YouTube id of its own; this finds the
+        // upload by title, artist and runtime — the same item the error path
+        // falls back to. Revert always means YouTube's audio.
+        val original = item.toYouTubeFallbackMediaItem() ?: return
 
         OriginalVersion.pin(song.videoId)
+        // Drops a lossless search still running behind a source row, and any
+        // stream already found for it — the listener just said "not that".
+        QualityUpgrade.forget(song.videoId)
+        // "Upgrade quality" straight after a revert is a fresh request, not a
+        // repeat: the cooldown silently swallowed it, and the track stayed on
+        // Opus with nothing on screen to say why.
+        manualUpgradeThrottle.reset()
         val position = activePlayer.currentPosition
         val wasPlaying = activePlayer.isPlaying
         swappingMediaId = song.videoId
-        activePlayer.replaceMediaItem(index, song.toDirectYouTubeMediaItem())
+        activePlayer.replaceMediaItem(index, original)
         activePlayer.seekTo(index, position)
         if (wasPlaying) activePlayer.play()
         refreshCustomLayouts()
@@ -4296,7 +4392,14 @@ class PlaybackService : MediaLibraryService() {
             }
             val better = withContext(Dispatchers.IO) {
                 QualityUpgrade.lookAgain(mediaId, playingSeconds)
-            } ?: return@launch
+            } ?: run {
+                // Logged, so a search that found nothing doesn't read in the
+                // log like a button that did nothing.
+                if (QualityUpgrade.isAskedByHand(mediaId) && QualityUpgrade.hasAnsweredFor(mediaId)) {
+                    TrackLog.d("BitChord", "upgrade by hand found no better copy of $mediaId", about = mediaId)
+                }
+                return@launch
+            }
             try {
                 swapIn(mediaId, better)
             } finally {
@@ -4406,7 +4509,9 @@ class PlaybackService : MediaLibraryService() {
                 ?.audioFormat
         } ?: return false
         val mime = format.sampleMimeType ?: return false
-        val videoId = uri.getQueryParameter("v") ?: return false
+        // A reverted source row has no `v`; its media id is what a download is
+        // filed under.
+        val videoId = uri.getQueryParameter("v") ?: mediaIdIn(uri) ?: return false
         val downloaded = com.music.bitchord.download.Downloads.savedUri(this, videoId) != null
         if (downloaded) return false
         val target = SourceResolver.targetIn(uri)
@@ -5175,8 +5280,12 @@ class PlaybackService : MediaLibraryService() {
         // [TrackLog.about]. Without it the module walk and the client walk both
         // log from a scope that knows nothing, which is most of what a resolve
         // has to say about itself.
+        // The lossless sources still searching when a lossy answer wins — see
+        // [SourceResolver.bestAcross]. Handed to [QualityUpgrade] so the FLAC
+        // swaps in the moment it lands, with no wait before the first note.
+        val late = CompletableDeferred<SourceStream?>()
         val lookup = scope.async(Dispatchers.IO + TrackLog.about(videoId)) {
-            withTimeoutOrNull(SUBSTITUTE_TIMEOUT_MS) { SourceResolver.substituteForYouTube(target) }
+            withTimeoutOrNull(SUBSTITUTE_TIMEOUT_MS) { SourceResolver.substituteForYouTube(target, late) }
         }
         // Started now rather than after the modules have had their say, and
         // wrapped rather than thrown from: it is awaited only on the paths
@@ -5221,6 +5330,7 @@ class PlaybackService : MediaLibraryService() {
         // few seconds in instead of a clean start, which is the trade this
         // whole path is built to make.
         if (quick != null && StreamContainer.isManifest(quick.url)) {
+            late.cancel()
             val url = runCatching { fallback.await().getOrThrow() }.getOrNull()
             if (url != null) {
                 TrackLog.d(
@@ -5262,6 +5372,7 @@ class PlaybackService : MediaLibraryService() {
             // Everything that was asked for, ahead of the fallback: the
             // ordinary good case, and the one with no seam in it.
             if (!quick.belowRequest) {
+                late.cancel()
                 NerdStats.onLosslessRaceEnd(videoId)
                 return Resolved.Module(quick)
             }
@@ -5271,6 +5382,7 @@ class PlaybackService : MediaLibraryService() {
             val settled = QualityUpgrade.settledForLess(
                 mediaId = videoId,
                 target = target,
+                inFlight = late,
                 playing = quick.format,
                 servedBy = quick.sourceConfigId,
             )
@@ -5290,6 +5402,7 @@ class PlaybackService : MediaLibraryService() {
             target = target,
             inFlight = lookup.takeIf { lookup.isActive },
             playing = NerdStats.pickedBitrateKbps(videoId)?.let { StreamFormat(kbps = it) },
+            lossless = late,
         )
         if (!pending) NerdStats.onLosslessRaceEnd(videoId)
         return Resolved.YouTube(url)
@@ -5620,9 +5733,15 @@ class PlaybackService : MediaLibraryService() {
                 Pair(localBitrateCache[mediaId], TelemetryProvenance.AUTHORITATIVE)
             NerdStats.declaredFormat(mediaId)?.kbps != null ->
                 Pair(NerdStats.declaredFormat(mediaId)?.kbps, TelemetryProvenance.AUTHORITATIVE)
-            NerdStats.pickedBitrateKbps(mediaId) != null ->
+            // YouTube's figure — it is what [NerdStats.pickedBitrateKbps]
+            // records, and YouTube is never lossless. A FLAC that won the race
+            // (or swapped in) for a YouTube id still has YouTube's walk on
+            // record under that id, which read as "FLAC · 148 kbps".
+            !isLossless && NerdStats.pickedBitrateKbps(mediaId) != null ->
                 Pair(NerdStats.pickedBitrateKbps(mediaId), TelemetryProvenance.AUTHORITATIVE)
-            dsd == null && isRawPcm && pcmDataRate != null ->
+            // Lossless with no stated encoded bitrate: its PCM rate (1411 for
+            // 16-bit/44.1 stereo) is the honest figure, marked as derived.
+            dsd == null && (isRawPcm || isLossless) && pcmDataRate != null ->
                 Pair(pcmDataRate, TelemetryProvenance.DERIVED)
             else ->
                 Pair(null, TelemetryProvenance.UNKNOWN)

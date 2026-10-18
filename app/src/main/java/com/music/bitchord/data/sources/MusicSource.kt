@@ -52,6 +52,8 @@ data class SourceStream(
      * reproduces the stream already playing.
      */
     val sourceConfigId: String? = null,
+    /** The catalogue row this stream was opened from — for YouTube, the video id. */
+    val matchedId: String? = null,
 )
 
 /**

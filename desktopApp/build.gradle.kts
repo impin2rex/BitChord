@@ -7,7 +7,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 val appVersion: String = providers.gradleProperty("bitchord.version").orNull
     ?.removePrefix("v")
     ?.takeIf { it.isNotBlank() }
-    ?: "1.8-beta1"
+    // The same version the Android build ships, from the root build — a hard-coded fallback here
+    // went stale and made every local or unversioned build announce itself as 1.8-beta1, which
+    // the update checker then offered to "update" to an older release.
+    ?: rootProject.extra["bitchordVersionName"] as String
 
 /** Which platform this build is *for*, which is the host unless told otherwise. */
 val hostIsWindows = System.getProperty("os.name").contains("Windows", ignoreCase = true)

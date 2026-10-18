@@ -682,6 +682,9 @@ fun Song.toMediaItem(): MediaItem {
         // option either.
         sourceTrack != null -> SourceRegistry.trackUri(sourceTrack.first, sourceTrack.second)
             .let { "$it${matchQuery()}${pickedMixQuery(sourceTrack.first)}" }
+            // Reverted by hand, a source row stays on YouTube's upload too —
+            // under its own `q=original` cache entry, never the source's.
+            .let { if (OriginalVersion.isPinned(videoId)) PlaybackFallback.directYouTubeSourceUri(it) else it }
         // A track the listener reverted by hand stays reverted — see
         // [OriginalVersion]. Applied here rather than at the one menu that
         // reverts, because "stays" has to mean the next queue entry built for
@@ -826,6 +829,15 @@ fun Song.hasYouTubeOriginal(): Boolean =
         !videoId.startsWith("file://") &&
         !isVideo &&
         SourceRegistry.parseTrackKey(videoId) == null
+
+/**
+ * Whether "Revert to original" means something for this song: a YouTube row,
+ * or a JioSaavn/addon/module row whose title and artist can find the upload —
+ * see [toYouTubeFallbackMediaItem]. Revert always lands on YouTube's own audio.
+ */
+fun Song.canRevertToOriginal(): Boolean =
+    hasYouTubeOriginal() ||
+        (SourceRegistry.parseTrackKey(videoId) != null && !isVideo && title.isNotBlank())
 
 /** A playback URI carrying this is explicitly requested YouTube, never a substitute. */
 const val DIRECT_YOUTUBE_PARAMETER = "direct_youtube"

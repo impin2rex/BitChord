@@ -196,6 +196,7 @@ import com.music.bitchord.playback.autoplaySectionStart
 import com.music.bitchord.playback.beginRadioQueue
 import com.music.bitchord.playback.commitRadioQueue
 import com.music.bitchord.playback.fromAutoplay
+import com.music.bitchord.playback.canRevertToOriginal
 import com.music.bitchord.playback.hasYouTubeOriginal
 import com.music.bitchord.playback.loadAutoplayTracks
 import com.music.bitchord.playback.playSongs
@@ -4418,7 +4419,7 @@ private fun BitChordApp(
                 // match sounds like a wrong match whether or not anything
                 // announced itself. See [Song.hasYouTubeOriginal].
                 onRollbackToOriginal = if (fromPlayer &&
-                    song.hasYouTubeOriginal() &&
+                    song.canRevertToOriginal() &&
                     // Nothing to revert *from*: the listener is hearing a
                     // file they saved, not a stream anything chose.
                     song.localUri == null &&

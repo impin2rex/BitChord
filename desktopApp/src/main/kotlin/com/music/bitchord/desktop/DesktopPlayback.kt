@@ -118,21 +118,28 @@ data class DesktopStreamFormat(
     fun nerdSnapshot(sourceId: String?): NerdStats.Snapshot =
         NerdStats.Snapshot(
             mimeType = codecName?.let { "audio/$it" },
-            bitrateKbps = kbps,
+            bitrateKbps = kbpsOrPcm,
             sampleRateHz = sampleRateHz,
             channels = channels,
             bitDepth = bitDepth,
             sourceName = sourceId,
         )
 
+    /** What a lossless stream's samples decode to — 1411 for 16-bit/44.1kHz stereo. */
+    private val pcmKbps: Int?
+        get() = if (isLossless && bitDepth != null && sampleRateHz != null && channels != null) {
+            bitDepth * sampleRateHz * channels / 1_000
+        } else {
+            null
+        }
+
     /** The rate to state on screen. */
     private val statedKbps: Int?
-        get() = when {
-            !isLossless -> kbps
-            bitDepth != null && sampleRateHz != null && channels != null ->
-                bitDepth * sampleRateHz * channels / 1_000
-            else -> null
-        }
+        get() = if (isLossless) pcmKbps else kbps
+
+    /** The stream's own bitrate, or for lossless with none stated, its PCM rate — as on the phone. */
+    internal val kbpsOrPcm: Int?
+        get() = kbps ?: pcmKbps
 
     /** The codec under its usual name rather than its container's or FFmpeg's. */
     internal val codecLabel: String?
